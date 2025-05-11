@@ -44,6 +44,10 @@ def root(
 def register_form(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
+from fastapi.responses import RedirectResponse
+import secrets
+from email_utils import send_verification_email
+
 @app.post("/register")
 def register_user(
     request: Request,
@@ -54,17 +58,44 @@ def register_user(
 ):
     existing = session.query(User).filter(User.email == email).first()
     if existing:
-        return templates.TemplateResponse("register.html", {"request": request, "error": "Email уже зарегистрирован"})
+        return templates.TemplateResponse("register.html", {
+            "request": request,
+            "error": "Email уже зарегистрирован"
+        })
 
-    new_user = User(name=name,
-                    email=email,
-                    password_hash=hash_password(password),
-                    role="user",
-                    verification_status="unverified")
+    token = secrets.token_urlsafe(32)
+
+    new_user = User(
+        name=name,
+        email=email,
+        password_hash=hash_password(password),
+        role="user",
+        verification_status="unverified",
+        verification_token=token
+    )
 
     session.add(new_user)
     session.commit()
-    return RedirectResponse("/login", status_code=302)
+
+    send_verification_email(email, token)
+
+    return templates.TemplateResponse("register_success.html", {
+        "request": request,
+        "message": "Письмо для подтверждения отправлено на вашу почту"
+    })
+
+@app.get("/verify")
+def verify_email(token: str, session: Session = Depends(get_session)):
+    user = session.query(User).filter(User.verification_token == token).first()
+    if not user:
+        return HTMLResponse("Неверный или устаревший токен", status_code=400)
+
+    user.verification_status = "verified"
+    user.verification_token = None
+    session.commit()
+
+    return HTMLResponse("Почта успешно подтверждена. Теперь вы можете войти.")
+
 
 @app.get("/login", response_class=HTMLResponse)
 def login_form(request: Request):

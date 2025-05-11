@@ -17,6 +17,9 @@ class User(SQLModel, table=True):
     verification_status: str = Field(default="not_requested")  # может быть not_requested / pending / approved / rejected
     rejection_reason: Optional[str] = None
     role: str = Field(default="user")
+    is_email_verified: bool = Field(default=False)
+    email_verification_token: Optional[str] = None
+
 
 class Employee(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
