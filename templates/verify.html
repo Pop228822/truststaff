@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="record-form" style="max-width: 600px; margin: 2rem auto; text-align: center;">
+    {% if success %}
+      <h2>Почта подтверждена ✅</h2>
+      <p>Вы успешно подтвердили вашу почту.</p>
+      <a href="/login" class="big-button" style="color: white;">Перейти ко входу</a>
+    {% else %}
+      <h2 style="color: #e74c3c;">Ошибка ❌</h2>
+      <p>{{ message }}</p>
+      <a href="/" class="big-button">На главную</a>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -84,18 +84,31 @@ def register_user(
         "message": "Письмо для подтверждения отправлено на вашу почту"
     })
 
-@app.get("/verify")
-def verify_email(token: str, session: Session = Depends(get_session)):
-    user = session.query(User).filter(User.verification_token == token).first()
-    if not user:
-        return HTMLResponse("Неверный или устаревший токен", status_code=400)
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from fastapi import Request
 
-    user.verification_status = "verified"
-    user.verification_token = None
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/verify", response_class=HTMLResponse)
+def verify_email(request: Request, token: str, session: Session = Depends(get_session)):
+    user = session.query(User).filter(User.email_verification_token == token).first()
+    if not user:
+        return templates.TemplateResponse("verify.html", {
+            "request": request,
+            "success": False,
+            "message": "Неверный или устаревший токен"
+        })
+
+    user.is_email_verified = True
+    user.email_verification_token = None
     session.commit()
 
-    return HTMLResponse("Почта успешно подтверждена. Теперь вы можете войти.")
-
+    return templates.TemplateResponse("verify.html", {
+        "request": request,
+        "success": True,
+        "message": "Почта успешно подтверждена. Теперь вы можете войти."
+    })
 
 @app.get("/login", response_class=HTMLResponse)
 def login_form(request: Request):
