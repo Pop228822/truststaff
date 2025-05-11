@@ -236,11 +236,6 @@ def generate_consent_pdf(
         headers={"Content-Disposition": f"attachment; filename=consent_{employee.id}.pdf"}
     )
 
-#временно на секунду
-from app.routes import migrate
-app.include_router(migrate.router)
-
-
 from app.auth import get_session_user
 
 @app.get("/check", response_class=HTMLResponse)
