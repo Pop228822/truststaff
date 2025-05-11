@@ -9,3 +9,4 @@ python-dotenv
 requests
 jinja2
 pdfkit
+python-multipart

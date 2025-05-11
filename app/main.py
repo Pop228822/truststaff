@@ -99,7 +99,7 @@ def login_user(
 
     token = create_access_token({"sub": str(user.id)})
     response = RedirectResponse("/", status_code=302)
-    response.set_cookie(key="access_token", value=token, httponly=True)
+    response.set_cookie(key="access_token", value=token, httponly=True, secure=True, samesite="lax")
     return response
 
 @app.get("/logout")
