@@ -71,7 +71,7 @@ def register_user(
         password_hash=hash_password(password),
         role="user",
         verification_status="unverified",
-        verification_token=token
+        email_verification_token=token
     )
 
     session.add(new_user)
@@ -137,6 +137,12 @@ def login_user(
         return templates.TemplateResponse("login.html", {
             "request": request,
             "error": "Неверный логин или пароль"
+        })
+
+    if not user.is_email_verified:
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "error": "Подтвердите почту перед входом. Ссылка отправлена на email."
         })
 
     log_login_attempt(session, email, ip, True)
