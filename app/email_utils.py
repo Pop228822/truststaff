@@ -25,4 +25,7 @@ def send_verification_email(email: str, token: str) -> bool:
             "lang": "ru"
         }
     )
+    print("📤 UniSender ответ:", response.status_code)
+    print("🔍 Ответ от API:", response.text)
+
     return response.status_code == 200
