@@ -44,9 +44,9 @@ def root(
 def register_form(request: Request):
     return templates.TemplateResponse("register.html", {"request": request})
 
-from fastapi.responses import RedirectResponse
+
 import secrets
-from email_utils import send_verification_email
+from app.email_utils import send_verification_email
 
 @app.post("/register")
 def register_user(
