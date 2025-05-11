@@ -1,7 +1,8 @@
 fastapi
 uvicorn[standard]
 sqlmodel
-passlib[bcrypt]
+bcrypt>=4.0.1
+passlib[bcrypt]>=1.7.4
 python-jose[cryptography]
 alembic
 psycopg2-binary  # если PostgreSQL
