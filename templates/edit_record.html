@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="record-form">
+    <h2>📝 Редактирование записи о сотруднике</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="position">Должность:</label>
+            <input type="text" id="position" name="position" value="{{ record.position }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="hired_at">Дата приёма:</label>
+            <input type="date" id="hired_at" name="hired_at" value="{{ record.hired_at.date() }}">
+        </div>
+
+        <div class="form-group">
+            <label for="fired_at">Дата увольнения (если есть):</label>
+            <input type="date" id="fired_at" name="fired_at" value="{{ record.fired_at.date() if record.fired_at else '' }}">
+        </div>
+
+        <div class="form-group">
+            <label for="commendation">Положительная характеристика:</label>
+            <textarea id="commendation" name="commendation">{{ record.commendation or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="misconduct">Нарушения (если были):</label>
+            <textarea id="misconduct" name="misconduct">{{ record.misconduct or '' }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="dismissal_reason">Причина увольнения (если есть):</label>
+            <textarea id="dismissal_reason" name="dismissal_reason">{{ record.dismissal_reason or '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">💾 Сохранить</button>
+            <a href="/employees" class="btn-secondary">← Назад</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

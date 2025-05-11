@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="record-form">
+    <h2>👤 Добавить сотрудника</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="full_name">ФИО:</label>
+            <input type="text" id="full_name" name="full_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="birth_date">Дата рождения:</label>
+            <input type="date" id="birth_date" name="birth_date" required>
+        </div>
+
+        <div class="form-group">
+            <label for="contact">Контакт:</label>
+            <input type="text" id="contact" name="contact">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">➕ Добавить</button>
+            <a href="/employees" class="btn-secondary">← Назад</a>
+        </div>
+
+        {% if error %}
+            <p style="color: red; font-weight: bold;">{{ error }}</p>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

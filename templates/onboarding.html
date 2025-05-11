@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="record-form">
+    <h2 style="text-align: center;">Верификация работодателя</h2>
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="company_name">Название компании / ИП</label>
+            <input type="text" name="company_name" id="company_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="city">Город регистрации</label>
+            <input type="text" name="city" id="city" required>
+        </div>
+
+        <div class="form-group">
+            <label for="inn_or_ogrn">ИНН / ОГРНИП / ОГРН</label>
+            <input type="text" name="inn_or_ogrn" id="inn_or_ogrn" required>
+        </div>
+
+        <div class="form-group">
+            <label for="passport_file">Фото паспорта (1-я страница)</label>
+            <input type="file" name="passport_file" id="passport_file" accept="image/*,.pdf" required>
+        </div>
+
+        <div style="text-align: center;">
+            <button type="submit" class="big-button">Отправить на проверку</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="record-form">
+    <h2>🔍 Проверка сотрудника</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="full_name">ФИО:</label>
+            <input type="text" id="full_name" name="full_name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="birth_date">Дата рождения (необязательно):</label>
+            <input type="date" id="birth_date" name="birth_date">
+        </div>
+
+        <div class="form-actions">
+            <button type="submit">Проверить</button>
+        </div>
+    </form>
+</div>
+
+{% if result is not none %}
+<div class="record-form" style="margin-top: 2rem;">
+    {% if result %}
+        <h3>⚠ Найдено {{ result|length }} совпадений:</h3>
+        <div class="employee-cards">
+        {% for emp in result %}
+            <div class="employee-card">
+                <h4>{{ emp.full_name }}{% if emp.birth_date %}, {{ emp.birth_date }}{% endif %}</h4>
+                <p><strong>Нарушений:</strong> {{ emp.record_count }}</p>
+
+                {% for r in emp.records %}
+                    <div class="record-block">
+                        <p><strong>📌 Должность:</strong> {{ r.position }}</p>
+                        <p><strong>🗓 Принят:</strong> {{ r.hired_at }}
+                        {% if r.fired_at %} → <strong>Уволен:</strong> {{ r.fired_at }}{% endif %}</p>
+                        {% if r.commendation %}<p><strong>👍 Похвала:</strong> {{ r.commendation }}</p>{% endif %}
+                        {% if r.misconduct %}<p><strong>⚠ Нарушения:</strong> {{ r.misconduct }}</p>{% endif %}
+                        {% if r.dismissal_reason %}<p><strong>🚪 Причина увольнения:</strong> {{ r.dismissal_reason }}</p>{% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p><strong>✅ Совпадений не найдено.</strong></p>
+    {% endif %}
+</div>
+{% endif %}
+
+<p><a href="/">← На главную</a></p>
+{% endblock %}

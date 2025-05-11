@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Добавить запись о сотруднике</h2>
+<form method="post" class="record-form">
+    <label>Должность:<br>
+        <input type="text" name="position" required>
+    </label><br><br>
+
+    <label>Дата приёма:<br>
+        <input type="date" name="hired_at" required>
+    </label><br><br>
+
+    <label>Дата увольнения (если есть):<br>
+        <input type="date" name="fired_at">
+    </label><br><br>
+
+    <label>Положительная характеристика (рекомендация):<br>
+        <textarea name="commendation" placeholder="Например: ответственный, пунктуальный..."></textarea>
+    </label><br><br>
+
+    <label>Нарушения (если были):<br>
+        <textarea name="misconduct"></textarea>
+    </label><br><br>
+
+    <label>Причина увольнения (если есть):<br>
+        <textarea name="dismissal_reason"></textarea>
+    </label><br><br>
+
+    <button type="submit">Добавить запись</button>
+</form>
+{% endblock %}

@@ -1,0 +1,9 @@
+fastapi
+uvicorn[standard]
+sqlmodel
+passlib[bcrypt]
+python-jose[cryptography]
+alembic
+psycopg2-binary  # если PostgreSQL
+python-dotenv
+requests

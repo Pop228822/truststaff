@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="record-form">
+    <h2 style="text-align: center;">Регистрация</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="name">Имя</label>
+            <input type="text" name="name" id="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+
+        {% if error %}
+            <p style="color: red; text-align: center;"><em>{{ error }}</em></p>
+        {% endif %}
+
+        <div style="text-align: center;">
+            <button type="submit" class="big-button">Зарегистрироваться</button>
+        </div>
+    </form>
+
+    <div style="margin-top: 2rem; text-align: center;">
+        <p style="margin-bottom: 0.5rem;">Уже есть аккаунт?</p>
+        <a href="/login" class="big-button" style="color: white;">Войти</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Заявки на верификацию</h2>
+
+{% if pending %}
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ФИО</th>
+                    <th>Email</th>
+                    <th>Компания</th>
+                    <th>Город</th>
+                    <th>ИНН/ОГРН</th>
+                    <th>Паспорт</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for u in pending %}
+                <tr>
+                    <td>{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ u.company_name }}</td>
+                    <td>{{ u.city }}</td>
+                    <td>{{ u.inn_or_ogrn }}</td>
+                    <td>
+                        {% if u.passport_filename %}
+                            <a href="/static/uploads/{{ u.passport_filename }}" target="_blank">Скачать</a>
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="post" action="/admin/approve/{{ u.id }}" style="display:inline">
+                            <button>✅</button>
+                        </form>
+                        <form method="post" action="/admin/reject/{{ u.id }}" style="display:inline-block; margin-top: 4px;">
+                            <textarea name="rejection_reason" placeholder="Причина" rows="2" cols="20" required></textarea><br>
+                            <button>❌ Отклонить</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p>Нет заявок на рассмотрение.</p>
+{% endif %}
+{% endblock %}
