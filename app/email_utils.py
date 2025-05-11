@@ -1,7 +1,7 @@
 import requests
 
 UNISENDER_API_KEY = "67iasjtbnx369bjo74bxu7kgtwcuusswcr7s8r5y"
-UNISENDER_EMAIL_FROM = "aeram.gazarian@yandex.ru"
+UNISENDER_EMAIL_FROM = "noreply.truststaff@yandex.ru"
 UNISENDER_SENDER_NAME = "TrustStaff"
 UNISENDER_LIST_ID = "3"
 
