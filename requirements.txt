@@ -7,3 +7,4 @@ alembic
 psycopg2-binary  # если PostgreSQL
 python-dotenv
 requests
+jinja2
