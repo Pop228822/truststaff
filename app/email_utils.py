@@ -3,6 +3,7 @@ import requests
 UNISENDER_API_KEY = "67iasjtbnx369bjo74bxu7kgtwcuusswcr7s8r5y"
 UNISENDER_EMAIL_FROM = "aeram.gazarian@yandex.ru"
 UNISENDER_SENDER_NAME = "TrustStaff"
+UNISENDER_LIST_ID = "3"
 
 
 def send_verification_email(email: str, token: str) -> bool:
@@ -13,9 +14,8 @@ def send_verification_email(email: str, token: str) -> bool:
     <a href="{link}">{link}</a><br><br>
     Если вы не регистрировались, просто проигнорируйте это письмо.
     """
-
     response = requests.post(
-        "https://api.unisender.com/ru/api/sendEmailMessage",
+        "https://api.unisender.com/ru/api/sendEmail",
         data={
             "format": "json",
             "api_key": UNISENDER_API_KEY,
@@ -24,7 +24,8 @@ def send_verification_email(email: str, token: str) -> bool:
             "sender_email": UNISENDER_EMAIL_FROM,
             "subject": "Подтвердите вашу почту",
             "body": body,
-            "lang": "ru"
+            "lang": "ru",
+            "list_id": UNISENDER_LIST_ID
         }
     )
 
