@@ -59,4 +59,3 @@ def reject_user(
         user.is_approved = False
         db.commit()
     return RedirectResponse("/admin/review", status_code=302)
-
