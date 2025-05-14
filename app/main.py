@@ -175,6 +175,17 @@ def add_employee(
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
+    # Считаем уже добавленных сотрудников у текущего пользователя
+    employee_count = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).count()
+
+    if employee_count >= 5:
+        # Если достигнут лимит, возвращаем форму с сообщением
+        return templates.TemplateResponse("add_employee.html", {
+            "request": request,
+            "error": "Вы уже добавили 30 сотрудников. Свяжитесь с поддержкой для увеличения лимита."
+        })
+
+    # Иначе добавляем нового сотрудника
     employee = Employee(
         full_name=full_name,
         birth_date=birth_date,
@@ -183,6 +194,7 @@ def add_employee(
     )
     db.add(employee)
     db.commit()
+
     return RedirectResponse("/employees", status_code=302)
 
 from fastapi.responses import RedirectResponse
