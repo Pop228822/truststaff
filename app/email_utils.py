@@ -47,3 +47,35 @@ def send_verification_email(to_addr: str, token: str) -> bool:
         # Логируем причину — удобно видеть в Render-логах
         print("❌ Ошибка отправки письма:", repr(exc))
         return False
+
+
+def send_password_reset_email(to_addr: str, token: str) -> bool:
+    """Отправляет письмо для восстановления пароля."""
+    link = f"https://truststaff.onrender.com/reset-password?token={token}"
+    body_html = f"""
+    <html><body>
+    Здравствуйте!<br><br>
+    Поступил запрос на восстановление пароля в TrustStaff.<br>
+    Чтобы сбросить пароль, перейдите по ссылке:<br>
+    <a href="{link}">{link}</a><br><br>
+    Если вы не делали этот запрос, просто проигнорируйте письмо.
+    </body></html>
+    """
+
+    msg = MIMEText(body_html, "html", "utf-8")
+    msg["Subject"] = "Восстановление пароля TrustStaff"
+    msg["From"] = formataddr((SENDER_NAME, SMTP_USER))
+    msg["To"] = to_addr
+
+    try:
+        ctx = ssl.create_default_context()
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=ctx) as server:
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_USER, [to_addr], msg.as_string())
+
+        print("📤 Email отправлен через sm17.hosting.reg.ru")
+        return True
+
+    except Exception as exc:
+        print("❌ Ошибка отправки письма:", repr(exc))
+        return False

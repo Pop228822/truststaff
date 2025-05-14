@@ -476,6 +476,15 @@ from app.routes import feedback
 
 app.include_router(feedback.router)
 
+
+from fastapi import FastAPI
+from app.routes import password_recovery
+
+app = FastAPI()
+
+app.include_router(password_recovery.router)
+
+
 from app.routes import admin
 app.include_router(admin.router)
 
