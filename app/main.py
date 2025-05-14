@@ -3,7 +3,7 @@ from jinja2 import Environment, FileSystemLoader
 from typing import Optional
 
 from fastapi import FastAPI, Request, Depends, HTTPException, Form, UploadFile, File
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pdfkit
 from sqlalchemy.orm import Session

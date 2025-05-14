@@ -1,22 +1,20 @@
 import smtplib
+import os
+from dotenv import load_dotenv
 import ssl
 from email.mime.text import MIMEText
 from email.utils import formataddr
 
-# ==== Константы SMTP ====
-SMTP_HOST = "sm16.hosting.reg.ru"      # ваш реальный SMTP-узел (ptr 31.31.196.47)
-SMTP_PORT = 465               # SSL-порт
-SMTP_USER = "noreply@truststaff.ru"
-SMTP_PASSWORD = "12Aram34-7"           # храните в env-переменной в проде!
+load_dotenv()
 
+SMTP_USER = "noreply@truststaff.ru"
 SENDER_NAME = "TrustStaff"
+SMTP_HOST = os.getenv("SMTP_HOST")
+SMTP_PORT = os.getenv("SMTP_PORT")
+SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 # ----------------------------------------------------------
 def send_verification_email(to_addr: str, token: str) -> bool:
-    """
-    Отправка письма с подтверждением регистрации.
-    Возвращает True при успехе, False при любой ошибке.
-    """
     link = f"https://truststaff.onrender.com/verify?token={token}"
     body_html = f"""
     <html><body>
@@ -39,7 +37,7 @@ def send_verification_email(to_addr: str, token: str) -> bool:
 
         # ➜ подключение, авторизация, отправка
         with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=ctx) as server:
-            server.login(SMTP_USER, SMTP_PASSWORD)       # авторизация
+            server.login(SMTP_USER, SMTP_PASSWORD)
             server.sendmail(SMTP_USER, [to_addr], msg.as_string())
 
         print("📤 Email отправлен через sm17.hosting.reg.ru")
