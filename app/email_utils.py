@@ -4,8 +4,8 @@ from email.mime.text import MIMEText
 from email.utils import formataddr
 
 # ==== Константы SMTP ====
-SMTP_HOST = "sm17.hosting.reg.ru"      # ваш реальный SMTP-узел (ptr 31.31.196.47)
-SMTP_PORT = 465                        # SSL-порт
+SMTP_HOST = "sm16.hosting.reg.ru"      # ваш реальный SMTP-узел (ptr 31.31.196.47)
+SMTP_PORT = 465               # SSL-порт
 SMTP_USER = "noreply@truststaff.ru"
 SMTP_PASSWORD = "12Aram34-7"           # храните в env-переменной в проде!
 
