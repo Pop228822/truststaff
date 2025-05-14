@@ -7,7 +7,7 @@ from email.utils import formataddr
 SMTP_HOST = "sm17.hosting.reg.ru"      # ваш реальный SMTP-узел (ptr 31.31.196.47)
 SMTP_PORT = 465                        # SSL-порт
 SMTP_USER = "noreply@truststaff.ru"
-SMTP_PASSWORD = "123321123@Aram"           # храните в env-переменной в проде!
+SMTP_PASSWORD = "12Aram34-7"           # храните в env-переменной в проде!
 
 SENDER_NAME = "TrustStaff"
 
