@@ -1,40 +1,34 @@
-import smtplib
+import smtplib, ssl
 from email.mime.text import MIMEText
 from email.utils import formataddr
 
-SMTP_HOST = "mail.truststaff.ru"
-SMTP_PORT = 587
+SMTP_HOST = "smtp.hosting.reg.ru"   # общий SMTP REG.RU
+SMTP_PORT = 465                     # SSL
 SMTP_USER = "noreply@truststaff.ru"
 SMTP_PASSWORD = "123321123@Aram"
-
 SENDER_NAME = "TrustStaff"
 
-def send_verification_email(email: str, token: str) -> bool:
+def send_verification_email(to_address: str, token: str) -> bool:
     link = f"https://truststaff.onrender.com/verify?token={token}"
-    body_html = f"""
-    <html><body>
+    html = f"""<html><body>
     Здравствуйте!<br><br>
     Чтобы подтвердить почту, перейдите по ссылке:<br>
     <a href="{link}">{link}</a><br><br>
     Если вы не регистрировались, просто проигнорируйте это письмо.
-    </body></html>
-    """
+    </body></html>"""
 
-    msg = MIMEText(body_html, "html", "utf-8")
+    msg = MIMEText(html, "html", "utf-8")
     msg["Subject"] = "Подтвердите вашу почту"
     msg["From"] = formataddr((SENDER_NAME, SMTP_USER))
-    msg["To"] = email
+    msg["To"] = to_address
 
     try:
-        with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as server:
-            server.ehlo()
-            server.starttls()
-            server.login(SMTP_USER, SMTP_PASSWORD)
-            server.sendmail(SMTP_USER, [email], msg.as_string())
-
-        print("📤 Email отправлено через SMTP")
+        ctx = ssl.create_default_context()          # доверяет GlobalSign
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=ctx) as s:
+            s.login(SMTP_USER, SMTP_PASSWORD)
+            s.sendmail(SMTP_USER, [to_address], msg.as_string())
+        print("📤 письмо отправлено")
         return True
-
     except Exception as e:
-        print("❌ Ошибка отправки:", e)
+        print("❌ SMTP-ошибка:", e)
         return False
