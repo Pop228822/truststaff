@@ -27,6 +27,8 @@ templates = Jinja2Templates(directory="templates")
 
 from app.auth import optional_user
 
+MAX_EMPLOYERS_COUNT = 30
+
 @app.get("/", response_class=HTMLResponse)
 def root(
     request: Request,
@@ -178,7 +180,7 @@ def add_employee(
     # Считаем уже добавленных сотрудников у текущего пользователя
     employee_count = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).count()
 
-    if employee_count >= 5:
+    if employee_count >= MAX_EMPLOYERS_COUNT:
         # Если достигнут лимит, возвращаем форму с сообщением
         return templates.TemplateResponse("add_employee.html", {
             "request": request,
@@ -242,6 +244,21 @@ def add_record(
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
+    # Считаем, сколько записей ReputationRecord уже есть у текущего пользователя по этому сотруднику
+    existing_records_count = db.query(ReputationRecord).filter(
+        ReputationRecord.employee_id == employee_id,
+        ReputationRecord.employer_id == current_user.id
+    ).count()
+
+    # Если уже 2 записи, то не разрешаем добавлять ещё
+    if existing_records_count >= 2:
+        return templates.TemplateResponse("add_record.html", {
+            "request": request,
+            "employee_id": employee_id,
+            "error": "Вы уже добавили 2 записи об этом сотруднике. Дальше добавлять нельзя."
+        })
+
+    # Если лимит не превышен, создаём новую запись
     record = ReputationRecord(
         employee_id=employee_id,
         employer_id=current_user.id,
@@ -254,7 +271,7 @@ def add_record(
     )
     db.add(record)
     db.commit()
-    return RedirectResponse(url=f"/employees", status_code=302)
+    return RedirectResponse(url="/employees", status_code=302)
 
 @app.get("/employee/{employee_id}/generate-consent", response_class=HTMLResponse)
 def consent_form(request: Request, employee_id: int, db: Session = Depends(get_session), current_user: User = Depends(only_approved_user)):
