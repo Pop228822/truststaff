@@ -434,6 +434,15 @@ def delete_record(
     db.commit()
     return RedirectResponse(url="/employees", status_code=302)
 
+@app.exception_handler(404)
+async def not_found(request: Request, exc: HTTPException):
+    """Отдаём HTML-страницу 404 с кнопкой «На главную»."""
+    return templates.TemplateResponse(
+        "404.html",
+        {"request": request},
+        status_code=404
+    )
+
 from app.routes import feedback
 
 app.include_router(feedback.router)
