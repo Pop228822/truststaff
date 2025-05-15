@@ -34,7 +34,7 @@ def root(
     request: Request,
     user: Optional[User] = Depends(optional_user)
 ):
-    return templates.TemplateResponse("base.html", {
+    return templates.TemplateResponse("index.html", {
         "request": request,
         "user": user,
         "verification_status": user.verification_status if user else None,

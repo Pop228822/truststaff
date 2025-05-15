@@ -1,0 +1,41 @@
+<header class="site-header">
+    <div class="container">
+        <div class="logo-title">
+            <img src="/static/logo.png" alt="TrustStaff Logo" class="logo">
+            <h1 class="title">TrustStaff</h1>
+        </div>
+        <nav class="navbar">
+            <a href="/">Домой</a>
+            <a href="/register">Регистрация</a>
+            <a href="/login">Вход</a>
+            <a href="/logout">Выход</a>
+            <a href="/employees">Сотрудники</a>
+            <a href="/add-employee">Добавить</a>
+            <a href="/check">Проверить работника</a>
+        </nav>
+    </div>
+</header>
+
+<hr>
+
+{% if user %}
+    <div class="user-status" style="margin-bottom: 1rem;">
+        <p>Привет, {{ user.name }} ({{ user.email }})</p>
+        {% if user.verification_status == "approved" %}
+            <p style="color: green;">✅ Верификация пройдена</p>
+        {% elif user.verification_status == "pending" %}
+            <p style="color: orange;">🟡 Верификация на рассмотрении</p>
+        {% elif user.verification_status == "rejected" %}
+            <p style="color: red;">❌ Верификация отклонена</p>
+            {% if user.rejection_reason %}
+                <p style="color: #b03b3b;"><em>{{ user.rejection_reason }}</em></p>
+            {% endif %}
+        {% else %}
+            <p style="color: gray;">🔒 Верификация не пройдена</p>
+        {% endif %}
+    </div>
+{% endif %}
+
+{% if user and user.role == 'admin' %}
+    <p><a href="/admin/review" class="big-button">Проверить заявки на верификацию</a></p>
+{% endif %}

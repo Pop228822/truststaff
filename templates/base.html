@@ -9,91 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-    <header class="site-header">
-        <div class="container">
-            <div class="logo-title">
-                <img src="/static/logo.png" alt="TrustStaff Logo" class="logo">
-                <h1 class="title">TrustStaff</h1>
-            </div>
-            <nav class="navbar">
-                <a href="/">Домой</a>
-                <a href="/register">Регистрация</a>
-                <a href="/login">Вход</a>
-                <a href="/logout">Выход</a>
-                <a href="/employees">Сотрудники</a>
-                <a href="/add-employee">Добавить</a>
-                <a href="/check">Проверить работника</a>
-            </nav>
-        </div>
-    </header>
-    <hr>
-
-    {% if user %}
-        <div class="user-status" style="margin-bottom: 1rem;">
-            <p>Привет, {{ user.name }} ({{ user.email }})</p>
-            {% if user.verification_status == "approved" %}
-                <p style="color: green;">✅ Верификация пройдена</p>
-            {% elif user.verification_status == "pending" %}
-                <p style="color: orange;">🟡 Верификация на рассмотрении</p>
-            {% elif user.verification_status == "rejected" %}
-                <p style="color: red;">❌ Верификация отклонена</p>
-                {% if user.rejection_reason %}
-                    <p style="color: #b03b3b;"><em>{{ user.rejection_reason }}</em></p>
-                {% endif %}
-            {% else %}
-                <p style="color: gray;">🔒 Верификация не пройдена</p>
-            {% endif %}
-        </div>
-    {% endif %}
-    {% if user and user.role == 'admin' %}
-        <p><a href="/admin/review" class="big-button">Проверить заявки на верификацию</a></p>
-    {% endif %}
-
-    {% if user and user.role == 'user' and request.url.path == '/' %}
-        <div class="record-form" style="margin-top: 2rem;">
-            <h3 style="text-align: center;">Ваша защита начинается с вас</h3>
-            <p>🚨 Каждая запись — это чей‑то сэкономленный бизнес. Добавляя сотрудника с нарушением, вы помогаете другим предпринимателям не потерять деньги.</p>
-            <div style="text-align: center;">
-                <a href="/add-employee" class="big-button" style="color: white;">Добавить запись о сотруднике</a>
-            </div>
-
-            <hr style="margin: 2rem 0;">
-
-            <h3 style="text-align: center;">Взаимная репутация</h3>
-            <p>🤝 Вы проверяете сотрудников — кто-то другой проверяет ваших. Система работает только если участвуют все.</p>
-            <div style="text-align: center;">
-                <a href="/employees" class="big-button">Мои сотрудники</a>
-            </div>
-
-            <hr style="margin: 2rem 0;">
-
-            <h3 style="text-align: center;">Чёрный список — не наказание, а предупреждение</h3>
-            <p>⚠️ Мы не наказываем — мы предупреждаем. Можно указать нарушение даже без увольнения.</p>
-            <div style="text-align: center;">
-                <a href="/add-employee" class="big-button">Сообщить о нарушении</a>
-            </div>
-        </div>
-        <div class="record-form" style="margin-top: 2rem;">
-            <h3 style="text-align: center;">Обратная связь</h3>
-            <form method="post" action="/feedback">
-                <div class="form-group">
-                    <label for="message">Сообщение</label>
-                    <textarea name="message" id="message" required placeholder="Что вам понравилось? Что можно улучшить?"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="contact">Как с вами связаться (необязательно)</label>
-                    <input type="text" name="contact" id="contact" placeholder="Телеграм, email или телефон">
-                </div>
-                    <div style="text-align: center;">
-                        <button type="submit" class="big-button">Отправить</button>
-                </div>
-            </form>
-            <p style="text-align: center; font-weight: 500; font-style: italic; color: #2c3e50; margin-top: 1.5rem;">
-                💙 Спасибо, что помогаете нам стать лучше!
-            </p>
-        </div>
-    {% endif %}
+    {% include "header.html" %}
 
     {% block content %}{% endblock %}
+
+    {% include "footer.html" %}
 </body>
 </html>
