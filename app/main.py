@@ -29,6 +29,14 @@ from app.auth import optional_user
 
 MAX_EMPLOYERS_COUNT = 30
 
+@app.get("/policy", response_class=HTMLResponse)
+def policy(request: Request):
+    return templates.TemplateResponse("policy.html", {"request": request})
+
+@app.get("/terms", response_class=HTMLResponse)
+def terms(request: Request):
+    return templates.TemplateResponse("terms.html", {"request": request})
+
 @app.get("/", response_class=HTMLResponse)
 def root(
     request: Request,
