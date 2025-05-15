@@ -198,23 +198,26 @@ def add_employee_form(request: Request, current_user: User = Depends(get_session
 @app.post("/add-employee")
 def add_employee(
     request: Request,
-    full_name: str = Form(...),
+    last_name: str = Form(...),
+    first_name: str = Form(...),
+    middle_name: str = Form(...),  # отчество можно сделать необязательным
     birth_date: str = Form(...),
     contact: str = Form(""),
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
-    # Считаем уже добавленных сотрудников у текущего пользователя
+    # Проверяем лимит
     employee_count = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).count()
-
     if employee_count >= MAX_EMPLOYERS_COUNT:
-        # Если достигнут лимит, возвращаем форму с сообщением
         return templates.TemplateResponse("add_employee.html", {
             "request": request,
             "error": "Вы уже добавили 30 сотрудников. Свяжитесь с поддержкой для увеличения лимита."
         })
 
-    # Иначе добавляем нового сотрудника
+    # Объединяем ФИО в одну строку
+    full_name = f"{last_name} {first_name} {middle_name}".strip()
+
+    # Создаем запись о сотруднике
     employee = Employee(
         full_name=full_name,
         birth_date=birth_date,
@@ -225,6 +228,7 @@ def add_employee(
     db.commit()
 
     return RedirectResponse("/employees", status_code=302)
+
 
 from fastapi.responses import RedirectResponse
 
