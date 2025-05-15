@@ -301,4 +301,95 @@ button.reject {
     }
 }
 
+/* Футер */
+.site-footer {
+    margin-top: 2rem;
+    background-color: #f3f3f3;
+    padding: 1.5rem 0;
+    border-top: 1px solid #ddd; /* Разделяем футер от остального контента */
+}
+
+.site-footer .container {
+    text-align: center;
+}
+
+.site-footer p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.site-footer p strong {
+    color: #2c3e50;
+}
+
+/* Ссылки в футере */
+.footer-links a {
+    margin: 0 0.5rem;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.2s;
+}
+
+.footer-links a:hover {
+    color: #1f6399;
+    text-decoration: underline;
+}
+
+/* Блок контактов */
+.contact a {
+    display: inline-block;
+    margin-top: 0.5rem;
+    color: #3498db;
+    text-decoration: none;
+    font-weight: normal; /* Можно оставить bold, если хотите */
+}
+
+.contact a:hover {
+    text-decoration: underline;
+    color: #1f6399;
+}
+
+
+/* Блок промо для незарегистрированных пользователей */
+.promo-section {
+    text-align: center;
+    margin: 3rem auto;
+    max-width: 600px;
+}
+
+.promo-section h2 {
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+    color: #2c3e50;
+}
+
+.promo-section p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+    color: #333;
+}
+
+.promo-section ul {
+    text-align: left;
+    margin: 1rem auto;
+    display: inline-block;
+    list-style-type: disc;
+    padding-left: 1.5rem; /* отступ, чтобы маркеры не наезжали */
+}
+
+.promo-section ul li {
+    margin-bottom: 0.5rem;
+}
+
+.promo-cta {
+    margin-top: 2rem;
+}
+
+/* Кнопки в блоке промо */
+.promo-cta .big-button {
+    margin: 0 0.5rem;
+}
 
