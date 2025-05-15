@@ -22,17 +22,37 @@ def forgot_password_send(
     email: str = Form(...),
     db: Session = Depends(get_session)
 ):
-    """Принимает email, если такой пользователь есть, отправляем письмо со ссылкой для сброса пароля."""
     user = db.query(User).filter(User.email == email).first()
-    # Чтобы не указывать, что пользователя нет, можно всегда возвращать "Письмо отправлено".
+
+    # Чтобы не указывать, что пользователя нет, возвращаем "Письмо отправлено".
     if not user:
         return templates.TemplateResponse("forgot_password.html", {
             "request": request,
             "message": "Если пользователь существует, вы получите письмо для восстановления."
         })
 
-    # Генерируем JWT токен для сброса пароля (или любой другой)
-    reset_token = create_access_token({"sub": str(user.id), "purpose": "reset_password"})
+    # --- ДОБАВЛЯЕМ ПРОВЕРКУ, не прошло ли 60 секунд c момента последнего запроса ---
+    from datetime import datetime, timedelta
+
+    now = datetime.utcnow()
+    if user.password_reset_requested_at:
+        diff = now - user.password_reset_requested_at
+        # Проверяем, если меньше 1 минуты, то не отправляем новое письмо
+        if diff < timedelta(minutes=1):
+            return templates.TemplateResponse("forgot_password.html", {
+                "request": request,
+                "message": "Вы уже запрашивали восстановление, подождите немного прежде чем отправлять новый запрос."
+            })
+
+    # Если не прошло, или первый раз — продолжаем
+    user.password_reset_requested_at = now
+    db.commit()
+
+    # Генерируем JWT токен для сброса пароля (expires_delta=30 минут)
+    reset_token = create_access_token(
+        {"sub": str(user.id), "purpose": "reset_password"},
+        expires_delta=timedelta(minutes=30)
+    )
 
     # Отправляем письмо
     send_ok = send_password_reset_email(to_addr=email, token=reset_token)
@@ -43,6 +63,7 @@ def forgot_password_send(
         "request": request,
         "message": "Проверьте свою почту для дальнейших инструкций"
     })
+
 
 @router.get("/reset-password", response_class=HTMLResponse)
 def reset_password_form(request: Request, token: str, db: Session = Depends(get_session)):

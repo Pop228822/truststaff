@@ -19,6 +19,7 @@ class User(SQLModel, table=True):
     role: str = Field(default="user")
     is_email_verified: bool = Field(default=False)
     email_verification_token: Optional[str] = None
+    password_reset_requested_at: Optional[datetime] = None
 
 
 class Employee(SQLModel, table=True):
