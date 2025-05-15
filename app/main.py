@@ -511,5 +511,16 @@ app.include_router(password_recovery.router)
 from app.routes import admin
 app.include_router(admin.router)
 
+from app.jobs.cleanup_PU import cleanup_pending_users
+from apscheduler.schedulers.background import BackgroundScheduler
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(cleanup_pending_users, 'interval', hours=24)
+scheduler.start()
+
+@app.on_event("shutdown")
+def shutdown_event():
+    scheduler.shutdown()
+
 from fastapi.staticfiles import StaticFiles
 app.mount("/static", StaticFiles(directory="static"), name="static")

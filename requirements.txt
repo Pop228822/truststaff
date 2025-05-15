@@ -11,3 +11,4 @@ requests
 jinja2
 pdfkit
 python-multipart
+APScheduler>=3.10,<4.0
