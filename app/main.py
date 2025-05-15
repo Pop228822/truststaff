@@ -20,7 +20,7 @@ from app.auth import (
     oauth2_scheme_optional
 )
 from app.database import get_session
-from app.models import ReputationRecord, User, Employee
+from app.models import ReputationRecord, User, Employee, PendingUser
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
@@ -50,7 +50,7 @@ def register_form(request: Request):
 import secrets
 from app.email_utils import send_verification_email
 
-@app.post("/register")
+@app.post("/register", response_class=HTMLResponse)
 def register_user(
     request: Request,
     name: str = Form(...),
@@ -58,32 +58,42 @@ def register_user(
     password: str = Form(...),
     session: Session = Depends(get_session)
 ):
-    existing = session.query(User).filter(User.email == email).first()
-    if existing:
+    # 1. Проверяем, нет ли пользователя c таким email (в User ИЛИ PendingUser)
+    #    Нужно, чтобы не было задвоений в PendingUser
+    existing_user = session.query(User).filter(User.email == email).first()
+    if existing_user:
         return templates.TemplateResponse("register.html", {
             "request": request,
             "error": "Email уже зарегистрирован"
         })
 
+    existing_pending = session.query(PendingUser).filter(PendingUser.email == email).first()
+    if existing_pending:
+        # Можно обновить токен и дату, или отклонить
+        return templates.TemplateResponse("register.html", {
+            "request": request,
+            "error": "На этот email уже есть незавершённая регистрация. Проверьте почту."
+        })
+
+    # 2. Генерируем токен
     token = secrets.token_urlsafe(32)
 
-    new_user = User(
+    # 3. Создаём PendingUser, а НЕ User
+    pending = PendingUser(
         name=name,
         email=email,
         password_hash=hash_password(password),
-        role="user",
-        verification_status="unverified",
         email_verification_token=token
     )
-
-    session.add(new_user)
+    session.add(pending)
     session.commit()
 
+    # 4. Отправляем письмо
     send_verification_email(email, token)
 
     return templates.TemplateResponse("register_success.html", {
         "request": request,
-        "message": "Письмо для подтверждения отправлено на вашу почту"
+        "message": "Проверьте почту для подтверждения регистрации."
     })
 
 from fastapi.responses import HTMLResponse
@@ -94,16 +104,33 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/verify", response_class=HTMLResponse)
 def verify_email(request: Request, token: str, session: Session = Depends(get_session)):
-    user = session.query(User).filter(User.email_verification_token == token).first()
-    if not user:
+    # 1. Ищем в PendingUser
+    pending = session.query(PendingUser).filter(
+        PendingUser.email_verification_token == token
+    ).first()
+
+    if not pending:
         return templates.TemplateResponse("verify.html", {
             "request": request,
             "success": False,
             "message": "Неверный или устаревший токен"
         })
 
-    user.is_email_verified = True
-    user.email_verification_token = None
+    # 2. Создаём настоящего User
+    new_user = User(
+        name=pending.name,
+        email=pending.email,
+        password_hash=pending.password_hash,
+        is_email_verified=True,
+        email_verification_token=None,
+        verification_status="unverified",  # Или как у вас
+        role="user",
+        created_at=datetime.utcnow()
+    )
+    session.add(new_user)
+
+    # 3. Удаляем PendingUser
+    session.delete(pending)
     session.commit()
 
     return templates.TemplateResponse("verify.html", {

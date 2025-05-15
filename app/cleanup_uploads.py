@@ -3,8 +3,8 @@ from pathlib import Path
 
 # Папка, где хранятся фото и pdf
 UPLOAD_DIR = Path("static/uploads")
-# Время жизни файла (7 дней)
-LIFETIME_SECONDS = 20
+# Время жизни файла (1 дней)
+LIFETIME_SECONDS = 60 * 60 * 24
 
 now = time.time()
 
