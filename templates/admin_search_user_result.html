@@ -3,11 +3,11 @@
 {% block content %}
 <div class="record-form">
     <h2>Результаты поиска</h2>
-
     <p>Вы искали: <strong>{{ searched_email }}</strong></p>
 
     <hr>
 
+    <!-- Информация о пользователе -->
     <h3>Информация о пользователе</h3>
     <p><strong>ID:</strong> {{ found_user.id }}</p>
     <p><strong>Имя:</strong> {{ found_user.name }}</p>
@@ -15,21 +15,54 @@
     <p><strong>Роль:</strong> {{ found_user.role }}</p>
     <p><strong>Статус верификации:</strong> {{ found_user.verification_status }}</p>
     {% if found_user.verification_status == "rejected" and found_user.rejection_reason %}
-        <p style="color: #b03b3b;"><em>Причина отказа: {{ found_user.rejection_reason }}</em></p>
+        <p style="color: #b03b3b;">
+            <em>Причина отказа: {{ found_user.rejection_reason }}</em>
+        </p>
     {% endif %}
+
+    <p><strong>Дата регистрации:</strong> {{ found_user.created_at or "Нет данных" }}</p>
+    <p><strong>Одобрен:</strong> {{ "Да" if found_user.is_approved else "Нет" }}</p>
+    <p><strong>Название компании:</strong> {{ found_user.company_name or "Нет данных" }}</p>
+    <p><strong>Город:</strong> {{ found_user.city or "Нет данных" }}</p>
+    <p><strong>ИНН или ОГРН:</strong> {{ found_user.inn_or_ogrn or "Нет данных" }}</p>
+    <p><strong>Загруженный паспорт:</strong> {{ found_user.passport_filename or "Нет данных" }}</p>
+    <p><strong>Email верифицирован:</strong> {{ "Да" if found_user.is_email_verified else "Нет" }}</p>
+    <p><strong>Токен для верификации email:</strong> {{ found_user.email_verification_token or "Нет данных" }}</p>
+    <p><strong>Время запроса сброса пароля:</strong> {{ found_user.password_reset_requested_at or "Нет данных" }}</p>
 
     <hr>
 
+    <!-- Сотрудники, добавленные пользователем -->
     <h3>Сотрудники, добавленные пользователем</h3>
     {% if employees %}
         <ul>
             {% for emp in employees %}
-                <li>
-                    <strong>{{ emp.full_name }}</strong>, род. {{ emp.birth_date }}
-                    <br>
-                    Контакт: {{ emp.contact if emp.contact else "Нет данных" }}
-                    <br>
-                    Дата добавления: {{ emp.created_at }}
+                <li style="margin-bottom: 1rem;">
+                    <strong>ФИО сотрудника:</strong> {{ emp.full_name }}<br>
+                    <strong>Дата рождения:</strong> {{ emp.birth_date }}<br>
+                    <strong>Контакт:</strong> {{ emp.contact if emp.contact else "Нет данных" }}<br>
+
+                    {# Записи (ReputationRecord) по этому сотруднику #}
+                    {% if emp.records %}
+                        <hr>
+                        <strong>Записи по сотруднику:</strong>
+                        <ul>
+                            {% for r in emp.records %}
+                                <li style="margin-bottom: 0.75rem;">
+                                    <strong>Record ID:</strong> {{ r.id }},
+                                    <strong>Добавлено:</strong> {{ r.created_at }}<br>
+                                    <strong>Должность:</strong> {{ r.position }}<br>
+                                    <strong>Дата найма:</strong> {{ r.hired_at }}<br>
+                                    <strong>Дата увольнения:</strong> {{ r.fired_at or "Не уволен(а)" }}<br>
+                                    <strong>Нарушение:</strong> {{ r.misconduct or "Нет данных" }}<br>
+                                    <strong>Причина увольнения:</strong> {{ r.dismissal_reason or "Нет данных" }}<br>
+                                    <strong>Похвала:</strong> {{ r.commendation or "Нет" }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p>Нет записей (ReputationRecord) по этому сотруднику.</p>
+                    {% endif %}
                 </li>
                 <hr>
             {% endfor %}
