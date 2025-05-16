@@ -22,7 +22,9 @@
             <label for="passport_file">Фото паспорта (1-я страница)</label>
             <input type="file" name="passport_file" id="passport_file" accept="image/*,.pdf" required>
         </div>
-
+        {% if error_message %}
+            <p style="color: red; font-weight: bold;">{{ error_message }}</p>
+        {% endif %}
         <div style="text-align: center;">
             <button type="submit" class="big-button">Отправить на проверку</button>
         </div>
