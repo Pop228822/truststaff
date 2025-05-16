@@ -7,6 +7,9 @@ from app.auth import create_access_token, hash_password
 from app.email_utils import send_password_reset_email  # Предполагаем, что такая функция есть
 from fastapi.templating import Jinja2Templates
 import os
+from jose import ExpiredSignatureError
+from fastapi.responses import RedirectResponse
+from jose import jwt, JWTError
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -51,7 +54,7 @@ def forgot_password_send(
     # Генерируем JWT токен для сброса пароля (expires_delta=30 минут)
     reset_token = create_access_token(
         {"sub": str(user.id), "purpose": "reset_password"},
-        expires_delta=timedelta(minutes=30)
+        expires_delta=timedelta(minutes=2)
     )
 
     # Отправляем письмо
@@ -79,9 +82,6 @@ def reset_password_form(request: Request, token: str, db: Session = Depends(get_
     })
 
 
-from fastapi.responses import RedirectResponse
-from jose import jwt, JWTError
-
 @router.post("/reset-password")
 def reset_password_process(
     token: str = Form(...),
@@ -96,14 +96,27 @@ def reset_password_process(
     # 2. Декодируем токен, проверяем срок действия и purpose
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
+    except ExpiredSignatureError:
+        # Токен просрочен
+        raise HTTPException(
+            status_code=400,
+            detail="Время действия ссылки для сброса пароля истекло. Повторите запрос на сброс пароля."
+        )
     except JWTError:
-        raise HTTPException(status_code=400, detail="Неверный или просроченный токен")
+        # Токен некорректен (подпись неверная, структура и т.п.)
+        raise HTTPException(
+            status_code=400,
+            detail="Неверный или повреждённый токен для сброса пароля."
+        )
 
     # В payload у нас sub=user_id, purpose="reset_password", exp=...
     user_id = payload.get("sub")
     purpose = payload.get("purpose")
     if not user_id or purpose != "reset_password":
-        raise HTTPException(status_code=400, detail="Токен не подходит для сброса пароля")
+        raise HTTPException(
+            status_code=400,
+            detail="Токен не подходит для сброса пароля (неверная цель)."
+        )
 
     # 3. Ищем пользователя по user_id
     user = db.query(User).filter(User.id == int(user_id)).first()
