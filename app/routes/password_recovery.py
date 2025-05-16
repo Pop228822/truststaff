@@ -69,21 +69,21 @@ def forgot_password_send(
 
 
 @router.get("/reset-password", response_class=HTMLResponse)
-def reset_password_form(request: Request, token: str, db: Session = Depends(get_session)):
+def reset_password_form(request: Request, token: str):
     """
-    Рендерим страницу, где пользователь вводит новый пароль.
-    token достаём из Query-параметра ?token=...
+    Страница, где пользователь вводит новый пароль.
+    token берём из query-параметра, например: /reset-password?token=...
     """
-    # Можно сразу проверить jwt.decode(token), срок действия, purpose="reset_password" и т.д.
-    # Но, как минимум, отобразим форму:
     return templates.TemplateResponse("reset_password.html", {
         "request": request,
-        "token": token
+        "token": token,
+        "error_message": None  # нет ошибки изначально
     })
 
 
-@router.post("/reset-password")
+@router.post("/reset-password", response_class=HTMLResponse)
 def reset_password_process(
+    request: Request,
     token: str = Form(...),
     password: str = Form(...),
     password2: str = Form(...),
@@ -91,41 +91,66 @@ def reset_password_process(
 ):
     # 1. Проверяем совпадение паролей
     if password != password2:
-        raise HTTPException(status_code=400, detail="Пароли не совпадают")
+        return templates.TemplateResponse(
+            "reset_password.html",
+            {
+                "request": request,
+                "token": token,
+                "error_message": "Пароли не совпадают"
+            }
+        )
 
-    # 2. Декодируем токен, проверяем срок действия и purpose
+    # 2. Декодируем токен
     try:
         payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
     except ExpiredSignatureError:
-        # Токен просрочен
-        raise HTTPException(
-            status_code=400,
-            detail="Время действия ссылки для сброса пароля истекло. Повторите запрос на сброс пароля."
+        # Токен просрочен → показываем ту же страницу с сообщением
+        return templates.TemplateResponse(
+            "reset_password.html",
+            {
+                "request": request,
+                "token": "",
+                "error_message": "Время действия ссылки для сброса пароля истекло. Пожалуйста, запросите новую ссылку."
+            }
         )
     except JWTError:
-        # Токен некорректен (подпись неверная, структура и т.п.)
-        raise HTTPException(
-            status_code=400,
-            detail="Неверный или повреждённый токен для сброса пароля."
+        # Токен некорректен
+        return templates.TemplateResponse(
+            "reset_password.html",
+            {
+                "request": request,
+                "token": "",
+                "error_message": "Неверный или повреждённый токен для сброса пароля. Запросите новую ссылку."
+            }
         )
 
-    # В payload у нас sub=user_id, purpose="reset_password", exp=...
+    # 3. Проверяем payload
     user_id = payload.get("sub")
     purpose = payload.get("purpose")
     if not user_id or purpose != "reset_password":
-        raise HTTPException(
-            status_code=400,
-            detail="Токен не подходит для сброса пароля (неверная цель)."
+        return templates.TemplateResponse(
+            "reset_password.html",
+            {
+                "request": request,
+                "token": "",
+                "error_message": "Неверный токен (не подходит для сброса пароля)."
+            }
         )
 
-    # 3. Ищем пользователя по user_id
+    # 4. Находим пользователя
     user = db.query(User).filter(User.id == int(user_id)).first()
     if not user:
-        raise HTTPException(status_code=400, detail="Пользователь не найден")
+        return templates.TemplateResponse(
+            "reset_password.html",
+            {
+                "request": request,
+                "token": "",
+                "error_message": "Пользователь не найден."
+            }
+        )
 
-    # 4. Сохраняем новый пароль
+    # 5. Сохраняем новый пароль
     user.password_hash = hash_password(password)
     db.commit()
 
-    # 5. Редиректим на /login
     return RedirectResponse("/login", status_code=302)
