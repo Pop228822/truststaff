@@ -434,6 +434,22 @@ def submit_onboarding(
     if user.verification_status == "approved":
         return RedirectResponse("/", status_code=302)
 
+    MAX_MB = 5
+    MAX_SIZE = MAX_MB * 1024 * 1024  # 5 MB в байтах
+
+    # Определяем размер
+    passport_file.file.seek(0, 2)  # Перемещаем указатель в конец файла
+    file_size = passport_file.file.tell()  # Считываем позицию (размер)
+    passport_file.file.seek(0)  # Возвращаемся в начало файла
+
+    if file_size > MAX_SIZE:
+        # Превышен лимит — возвращаем шаблон или выбрасываем ошибку
+        return templates.TemplateResponse("onboarding.html", {
+            "request": request,
+            "user": current_user,
+            "error_message": f"Файл превышает {MAX_MB} МБ. Попробуйте другой документ."
+        })
+
     filename = f"passport_{current_user.id}_{passport_file.filename}"
     filepath = os.path.join("static", "uploads", filename)
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
