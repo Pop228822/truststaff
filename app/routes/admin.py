@@ -123,6 +123,9 @@ def admin_users_list(
         .all()
     )
 
+    print("Users found:", users)  # посмотреть ID, emails...
+    print("skip =", skip, "limit =", limit)
+
     # Проверяем, есть ли ещё пользователи для "Загрузить ещё"
     has_more = (skip + limit) < total_count
 
