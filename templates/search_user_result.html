@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="record-form">
+    <h2>Результаты поиска</h2>
+
+    <p>Вы искали: <strong>{{ searched_email }}</strong></p>
+
+    <hr>
+
+    <h3>Информация о пользователе</h3>
+    <p><strong>ID:</strong> {{ found_user.id }}</p>
+    <p><strong>Имя:</strong> {{ found_user.name }}</p>
+    <p><strong>Email:</strong> {{ found_user.email }}</p>
+    <p><strong>Роль:</strong> {{ found_user.role }}</p>
+    <p><strong>Статус верификации:</strong> {{ found_user.verification_status }}</p>
+    {% if found_user.verification_status == "rejected" and found_user.rejection_reason %}
+        <p style="color: #b03b3b;"><em>Причина отказа: {{ found_user.rejection_reason }}</em></p>
+    {% endif %}
+
+    <hr>
+
+    <h3>Сотрудники, добавленные пользователем</h3>
+    {% if employees %}
+        <ul>
+            {% for emp in employees %}
+                <li>
+                    <strong>{{ emp.full_name }}</strong>, род. {{ emp.birth_date }}
+                    <br>
+                    Контакт: {{ emp.contact if emp.contact else "Нет данных" }}
+                    <br>
+                    Дата добавления: {{ emp.created_at }}
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>У данного пользователя пока нет добавленных сотрудников.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -2,18 +2,24 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
+from starlette import status
 
 from app.auth import get_current_user
 from app.database import get_session
-from app.models import User
+from app.models import User, Employee
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-def ensure_admin(current_user: User = Depends(get_current_user)):
+
+def ensure_admin(current_user: User = Depends(get_current_user)) -> User:
+    if current_user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail="Необходима авторизация")
     if current_user.role != "admin":
-        raise HTTPException(status_code=403)
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
+                            detail="Доступ разрешён только администратору")
     return current_user
 
 
@@ -59,3 +65,36 @@ def reject_user(
         user.is_approved = False
         db.commit()
     return RedirectResponse("/admin/review", status_code=302)
+
+
+@router.get("/search-user", response_class=HTMLResponse)
+def search_user_form(request: Request,
+                     current_user: User = Depends(ensure_admin)):
+    """Страница с формой поиска по email"""
+    return templates.TemplateResponse("search_user.html",
+                                      {"request": request})
+
+@router.post("/search-user", response_class=HTMLResponse)
+def search_user_result(request: Request,
+                       email: str = Form(...),
+                       db: Session = Depends(get_session),
+                       current_user: User = Depends(ensure_admin)):
+    """Обрабатываем форму, показываем пользователя и его сотрудников"""
+    email_clean = email.strip().lower()
+    user = db.query(User).filter(User.email == email_clean).first()
+
+    if user is None:
+        return templates.TemplateResponse("search_user.html",
+                                          {"request": request,
+                                           "error": f"Пользователь {email_clean} не найден."})
+
+    employees = (db.query(Employee)
+                   .filter(Employee.created_by_user_id == user.id)
+                   .order_by(Employee.created_at.desc())
+                   .all())
+
+    return templates.TemplateResponse("search_user_result.html",
+                                      {"request": request,
+                                       "searched_email": email_clean,
+                                       "found_user": user,
+                                       "employees": employees})
