@@ -94,7 +94,7 @@ def search_user_result(request: Request,
                                        "employees": employees})
 
 
-@router.get("/admin/users", response_class=HTMLResponse)
+@router.get("/admin/users/list", response_class=HTMLResponse)
 def admin_users_list(
     request: Request,
     db: Session = Depends(get_session),
