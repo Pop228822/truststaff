@@ -400,8 +400,16 @@ def check_employee(
 
 @app.get("/onboarding", response_class=HTMLResponse)
 def onboarding_form(request: Request, current_user: User = Depends(get_session_user)):
+    if not current_user:
+        return RedirectResponse("/login", status_code=302)
     if current_user and current_user.verification_status == "approved":
         return RedirectResponse("/", status_code=302)
+    if current_user.verification_status == "pending":
+        # Можно вернуть шаблон "onboarding_pending.html" или показать сообщение
+        return templates.TemplateResponse("onboarding_pending.html", {
+            "request": request,
+            "user": current_user
+        })
     return templates.TemplateResponse("onboarding.html", {"request": request, "user": current_user})
 
 @app.post("/onboarding")
@@ -414,6 +422,18 @@ def submit_onboarding(
     db: Session = Depends(get_session),
     current_user: User = Depends(get_session_user)
 ):
+
+    user = db.query(User).filter(User.id == current_user.id).first()
+    if user.verification_status == "pending":
+        return templates.TemplateResponse("onboarding_pending.html", {
+            "request": request,
+            "user": user,
+            "message": "Ваша заявка уже на рассмотрении. Повторно отправлять не нужно."
+        })
+
+    if user.verification_status == "approved":
+        return RedirectResponse("/", status_code=302)
+
     filename = f"passport_{current_user.id}_{passport_file.filename}"
     filepath = os.path.join("static", "uploads", filename)
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
