@@ -63,20 +63,14 @@ def reject_user(
         db.commit()
     return RedirectResponse("/admin/review", status_code=302)
 
-@router.get("/search/user/result", response_class=HTMLResponse)
+@router.get("admin/search/user/result", response_class=HTMLResponse)
 def search_user_result_id(request: Request,
                      current_user: User = Depends(ensure_admin)):
-    return templates.TemplateResponse("search_user_result.html",
+    return templates.TemplateResponse("admin_search_user_result.html",
                                       {"request": request})
 
-@router.get("/search/user", response_class=HTMLResponse)
-def search_user_form(request: Request,
-                     current_user: User = Depends(ensure_admin)):
-    """Страница с формой поиска по email"""
-    return templates.TemplateResponse("search_user.html",
-                                      {"request": request})
 
-@router.post("/search/user", response_class=HTMLResponse)
+@router.post("admin/search/user", response_class=HTMLResponse)
 def search_user_result(request: Request,
                        email: str = Form(...),
                        db: Session = Depends(get_session),
@@ -86,7 +80,7 @@ def search_user_result(request: Request,
     user = db.query(User).filter(User.email == email_clean).first()
 
     if user is None:
-        return templates.TemplateResponse("search_user.html",
+        return templates.TemplateResponse("admin_search_user.html",
                                           {"request": request,
                                            "error": f"Пользователь {email_clean} не найден."})
 
@@ -95,7 +89,7 @@ def search_user_result(request: Request,
                    .order_by(Employee.created_at.desc())
                    .all())
 
-    return templates.TemplateResponse("search_user_result.html",
+    return templates.TemplateResponse("admin_search_user_result.html",
                                       {"request": request,
                                        "searched_email": email_clean,
                                        "found_user": user,
