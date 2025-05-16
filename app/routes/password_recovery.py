@@ -54,7 +54,7 @@ def forgot_password_send(
     # Генерируем JWT токен для сброса пароля (expires_delta=30 минут)
     reset_token = create_access_token(
         {"sub": str(user.id), "purpose": "reset_password"},
-        expires_delta=timedelta(minutes=2)
+        expires_delta=timedelta(minutes=30)
     )
 
     # Отправляем письмо
