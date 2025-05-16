@@ -49,7 +49,8 @@ async def feedback(
             "index.html",
             {
                 "request": request,
-                "feedback_error": "Вы исчерпали лимит отзывов на сегодня."
+                "feedback_error": "Вы исчерпали лимит отзывов на сегодня.",
+                "user": current_user
             }
         )
 
