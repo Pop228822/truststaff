@@ -538,6 +538,10 @@ def delete_record(
     db.commit()
     return RedirectResponse(url="/employees", status_code=302)
 
+@app.get("/landing", response_class=HTMLResponse)
+def landing(request: Request):
+    return templates.TemplateResponse("landing.html", {"request": request})
+
 @app.exception_handler(404)
 async def not_found(request: Request, exc: HTTPException):
     """Отдаём HTML-страницу 404 с кнопкой «На главную»."""
