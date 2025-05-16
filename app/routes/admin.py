@@ -85,10 +85,7 @@ def search_user_result(request: Request,
                                           {"request": request,
                                            "error": f"Пользователь {email_clean} не найден."})
 
-    employees = (db.query(Employee)
-                   .filter(Employee.created_by_user_id == user.id)
-                   .order_by(Employee.created_at.desc())
-                   .all())
+    employees = db.query(Employee).filter(Employee.created_by_user_id == user.id).all()
 
     return templates.TemplateResponse("admin_search_user_result.html",
                                       {"request": request,
