@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, Depends, HTTPException, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
@@ -92,3 +92,75 @@ def search_user_result(request: Request,
                                        "searched_email": email_clean,
                                        "found_user": user,
                                        "employees": employees})
+
+
+@router.get("/admin/users", response_class=HTMLResponse)
+def admin_users_list(
+    request: Request,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(ensure_admin),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, gt=0, le=100)  # Макс 100
+):
+    """
+    Страница для отображения пользователей постранично по 10 (load more).
+    Сортировка: сначала верифицированные, затем по дате регистрации (убывание).
+    """
+    # Подсчитываем общее количество
+    total_count = db.query(User).count()
+
+    # Получаем нужный срез, используя CASE для приоритета по verified
+    # Если verification_status='approved', то CASE вернёт 1, иначе 0
+    # И сортируем по этому полю убыванием, затем по created_at убыванием
+    users = (
+        db.query(User)
+        .order_by(
+            (User.verification_status == "approved").desc(),
+            User.created_at.desc()
+        )
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+
+    # Проверяем, есть ли ещё пользователи для "Загрузить ещё"
+    has_more = (skip + limit) < total_count
+
+    return templates.TemplateResponse("admin_users_list.html", {
+        "request": request,
+        "users": users,
+        "skip": skip,
+        "limit": limit,
+        "has_more": has_more,
+        "total_count": total_count
+    })
+
+
+# --- 2. Страница подробностей о пользователе ---
+@router.get("/admin/user/{user_id}", response_class=HTMLResponse)
+def admin_user_details(
+    request: Request,
+    user_id: int,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(ensure_admin)
+):
+    """
+    Отображаем детали пользователя, его сотрудников и репутационные записи,
+    переиспользуя логику, которая раньше была в search_user_result.
+    """
+    found_user = db.query(User).filter(User.id == user_id).first()
+    if not found_user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    employees = (
+        db.query(Employee)
+        .filter(Employee.created_by_user_id == found_user.id)
+        .all()
+    )
+
+    return templates.TemplateResponse("admin_search_user_result.html", {
+        "request": request,
+        "searched_email": found_user.email,
+        "found_user": found_user,
+        "employees": employees
+    })
