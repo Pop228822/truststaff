@@ -385,8 +385,13 @@ button.reject {
 }
 
 .promo-cta {
-    margin-top: 2rem;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* чтобы кнопки были по центру */
+    gap: 0.5rem; /* это и есть вертикальный зазор между кнопками, меняйте как нужно */
 }
+
 
 /* Кнопки в блоке промо */
 .promo-cta .big-button {
