@@ -63,12 +63,13 @@ def reject_user(
         db.commit()
     return RedirectResponse("/admin/review", status_code=302)
 
-@router.get("admin/search/user/result", response_class=HTMLResponse)
-def search_user_result_id(request: Request,
-                     current_user: User = Depends(ensure_admin)):
-    return templates.TemplateResponse("admin_search_user_result.html",
-                                      {"request": request})
 
+@router.get("admin/search/user", response_class=HTMLResponse)
+def search_user_form(request: Request,
+                     current_user: User = Depends(ensure_admin)):
+    """Страница с формой поиска по email"""
+    return templates.TemplateResponse("admin_search_user.html",
+                                      {"request": request})
 
 @router.post("admin/search/user", response_class=HTMLResponse)
 def search_user_result(request: Request,
