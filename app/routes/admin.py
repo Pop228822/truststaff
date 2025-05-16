@@ -64,14 +64,14 @@ def reject_user(
     return RedirectResponse("/admin/review", status_code=302)
 
 
-@router.get("/search-user", response_class=HTMLResponse)
+@router.get("/search/user", response_class=HTMLResponse)
 def search_user_form(request: Request,
                      current_user: User = Depends(ensure_admin)):
     """Страница с формой поиска по email"""
     return templates.TemplateResponse("search_user.html",
                                       {"request": request})
 
-@router.post("/search-user", response_class=HTMLResponse)
+@router.post("/search/user", response_class=HTMLResponse)
 def search_user_result(request: Request,
                        email: str = Form(...),
                        db: Session = Depends(get_session),
