@@ -30,6 +30,7 @@ class Employee(SQLModel, table=True):
     created_by_user_id: int = Field(foreign_key="user.id")
     records: List["ReputationRecord"] = Relationship(back_populates="employee")
 
+
 class ReputationRecord(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     employee_id: int = Field(foreign_key="employee.id")
@@ -46,12 +47,14 @@ class ReputationRecord(SQLModel, table=True):
 
     employee: Optional[Employee] = Relationship(back_populates="records")
 
+
 class LoginAttempt(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     email: str
     ip_address: str
     success: bool
     attempt_time: datetime = Field(default_factory=datetime.utcnow)
+
 
 class PendingUser(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
@@ -60,3 +63,9 @@ class PendingUser(SQLModel, table=True):
     password_hash: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     email_verification_token: str  # Храним токен подтверждения
+
+
+class CheckLog(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)

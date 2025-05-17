@@ -2,9 +2,10 @@ from fastapi import APIRouter, Request, Depends, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from typing import Optional
 from sqlalchemy.orm import Session
+from datetime import date, datetime
 
 from app.database import get_session
-from app.models import User, Employee, ReputationRecord
+from app.models import User, Employee, ReputationRecord, CheckLog
 from app.auth import get_session_user
 from fastapi.templating import Jinja2Templates
 
@@ -21,7 +22,6 @@ def check_form(
         return RedirectResponse("/login", status_code=302)
     return templates.TemplateResponse("check.html", {"request": request, "result": None, "user": current_user})
 
-
 @router.post("/check", response_class=HTMLResponse)
 def check_employee(
     request: Request,
@@ -32,6 +32,29 @@ def check_employee(
 ):
     if not current_user:
         return RedirectResponse("/login", status_code=302)
+
+    from sqlalchemy import func
+
+    today = date.today()
+    start_of_day = datetime(today.year, today.month, today.day)
+
+    count_today = db.query(func.count(CheckLog.id)).filter(
+        CheckLog.user_id == current_user.id,
+        CheckLog.created_at >= start_of_day
+    ).scalar()
+
+    if count_today >= 20:
+        # Лимит исчерпан
+        return templates.TemplateResponse("check.html", {
+            "request": request,
+            "result": None,
+            "user": current_user,
+            "error_message": "Вы превысили лимит бесплатных проверок (20 в день)."
+        })
+
+    new_log = CheckLog(user_id=current_user.id)
+    db.add(new_log)
+    db.commit()
 
     query = db.query(Employee).filter(Employee.full_name.ilike(full_name.strip()))
     if birth_date:
@@ -53,3 +76,4 @@ def check_employee(
         "result": result,
         "user": current_user
     })
+

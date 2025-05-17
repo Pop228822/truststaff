@@ -3,6 +3,9 @@
 {% block content %}
 <div class="record-form">
     <h2>🔍 Проверка сотрудника</h2>
+    {% if error_message %}
+        <p style="color: red; font-weight: bold;">{{ error_message }}</p>
+    {% endif %}
     <form method="post">
         <div class="form-group">
             <label for="full_name">ФИО:</label>
