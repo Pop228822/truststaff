@@ -102,7 +102,7 @@ def reset_password_process(
 
     # 2. Декодируем токен
     try:
-        payload = jwt.decode(token, os.getenv("SECRET_KEY"), algorithms=["HS256"])
+        payload = jwt.decode(token, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
     except ExpiredSignatureError:
         # Токен просрочен → показываем ту же страницу с сообщением
         return templates.TemplateResponse(
