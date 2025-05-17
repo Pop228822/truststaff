@@ -356,48 +356,6 @@ def generate_consent_pdf(
 
 from app.auth import get_session_user
 
-@app.get("/check", response_class=HTMLResponse)
-def check_form(
-    request: Request,
-    current_user: Optional[User] = Depends(get_session_user)
-):
-    if not current_user:
-        return RedirectResponse("/login", status_code=302)
-    return templates.TemplateResponse("check.html", {"request": request, "result": None, "user": current_user})
-
-
-@app.post("/check", response_class=HTMLResponse)
-def check_employee(
-    request: Request,
-    full_name: str = Form(...),
-    birth_date: Optional[str] = Form(None),
-    db: Session = Depends(get_session),
-    current_user: Optional[User] = Depends(get_session_user)
-):
-    if not current_user:
-        return RedirectResponse("/login", status_code=302)
-
-    query = db.query(Employee).filter(Employee.full_name.ilike(full_name.strip()))
-    if birth_date:
-        query = query.filter(Employee.birth_date == birth_date)
-
-    employees = query.all()
-    result = []
-    for emp in employees:
-        records = db.query(ReputationRecord).filter(ReputationRecord.employee_id == emp.id).all()
-        result.append({
-            "full_name": emp.full_name,
-            "birth_date": emp.birth_date,
-            "record_count": len(records),
-            "records": records
-        })
-
-    return templates.TemplateResponse("check.html", {
-        "request": request,
-        "result": result,
-        "user": current_user
-    })
-
 @app.get("/onboarding", response_class=HTMLResponse)
 def onboarding_form(request: Request, current_user: User = Depends(get_session_user)):
     if not current_user:
@@ -551,14 +509,14 @@ async def not_found(request: Request, exc: HTTPException):
         status_code=404
     )
 
-from app.routes import feedback
+from app.routes.check import router as check_router
+app.include_router(check_router)
 
+from app.routes import feedback
 app.include_router(feedback.router)
 
 from app.routes import password_recovery
-
 app.include_router(password_recovery.router)
-
 
 from app.routes import admin
 app.include_router(admin.router)
