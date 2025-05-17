@@ -5,19 +5,20 @@
     <form method="post" enctype="multipart/form-data">
         <div class="form-group">
             <label for="company_name">Название компании / ИП</label>
-            <!-- Важно иметь id="company_name" для автокомплита -->
+            <!-- Поле ввода для поиска организации -->
             <input type="text" name="company_name" id="company_name" required>
+
+            <!-- Список для подсказок -->
+            <ul id="org-suggestions" style="margin-top: 0.5rem; border: 1px solid #ccc; border-radius: 4px; list-style: none; max-height: 200px; overflow-y: auto; padding: 0;"></ul>
         </div>
 
         <div class="form-group">
             <label for="city">Город регистрации</label>
-            <!-- id="city" чтобы заполнить из DaData (адрес) -->
             <input type="text" name="city" id="city" required>
         </div>
 
         <div class="form-group">
             <label for="inn_or_ogrn">ИНН / ОГРНИП / ОГРН</label>
-            <!-- id="inn_or_ogrn" чтобы заполнить из DaData -->
             <input type="text" name="inn_or_ogrn" id="inn_or_ogrn" required>
         </div>
 
@@ -36,33 +37,59 @@
     </form>
 </div>
 
-<!-- Подключаем автокомплит DaData именно здесь или в base.html -->
+<!-- Скрипт в самом низу, чтобы элементы были доступны -->
 <script>
-$(function(){
-    // Инициализируем автокомплит на поле company_name
-    $("#company_name").suggestions({
-        token: "6dfe3680159819e4134cf07cb9a92d899f8d3b1f",
-        type: "PARTY",   // Поиск по организациям (юрлица + ИП)
-        onSelect: function (suggestion) {
-            // suggestion.value = "ООО Ромашка"
-            $("#company_name").val(suggestion.value);
+const inputEl = document.getElementById('company_name');
+const listEl = document.getElementById('org-suggestions');
 
-            // ИНН
-            if (suggestion.data.inn) {
-                $("#inn_or_ogrn").val(suggestion.data.inn);
-            }
-            // ОГРН / ОГРНИП
-            // suggestion.data.ogrn, suggestion.data.ogrn_ip (для ИП) и т.д.
+// Чтобы избежать слишком частых запросов
+let timerId;
 
-            // Адрес
-            if (suggestion.data.address && suggestion.data.address.value) {
-                // Город может содержаться в address.data.city
-                // Или в address.value (полный адрес)
-                $("#city").val(suggestion.data.address.data.city
-                               || suggestion.data.address.value);
-            }
-        }
-    });
+inputEl.addEventListener('input', () => {
+  const query = inputEl.value.trim();
+  if (query.length < 2) {
+    listEl.innerHTML = "";
+    return;
+  }
+
+  clearTimeout(timerId);
+  timerId = setTimeout(() => {
+    loadSuggestions(query);
+  }, 300);
 });
+
+async function loadSuggestions(query) {
+  try {
+    const response = await fetch(`/autocomplete/orgs?query=${encodeURIComponent(query)}`);
+    const data = await response.json();  // { "results": [ ... ] }
+    listEl.innerHTML = "";
+    data.results.forEach(org => {
+      const li = document.createElement('li');
+      li.style.padding = '0.5rem';
+      li.style.cursor = 'pointer';
+      li.textContent = org.value; // Название организации
+      li.addEventListener('click', () => {
+        // Подставляем в инпут
+        inputEl.value = org.value;
+
+        // Дополнительно, если хотим подставлять ИНН, ОГРН, город
+        // document.getElementById('inn_or_ogrn').value = org.inn || org.ogrn;
+        // document.getElementById('city').value = org.address; // или вручную парсить
+
+        listEl.innerHTML = "";
+      });
+      li.addEventListener('mouseover', () => {
+        li.style.backgroundColor = '#eee';
+      });
+      li.addEventListener('mouseout', () => {
+        li.style.backgroundColor = '#fff';
+      });
+
+      listEl.appendChild(li);
+    });
+  } catch (err) {
+    console.error(err);
+  }
+}
 </script>
 {% endblock %}
