@@ -65,26 +65,20 @@ async function loadSuggestions(query) {
     listEl.innerHTML = "";
     data.results.forEach(org => {
       const li = document.createElement('li');
-      li.style.padding = '0.5rem';
-      li.style.cursor = 'pointer';
-      li.textContent = org.value; // Название организации
+
+      // Если хотите просто одной строкой:
+      // li.textContent = `${org.value} — ${org.inn} ${org.address}`;
+      // Или используем заранее сформированную строку org.display
+      // Но \n не отображается в HTML. Нужно заменить на <br>:
+      const html = org.display.replace('\n', '<br>');
+      li.innerHTML = html; // тогда будет перенос
+
       li.addEventListener('click', () => {
-        // Подставляем в инпут
+        // Подставляем только название
         inputEl.value = org.value;
-
-        // Дополнительно, если хотим подставлять ИНН, ОГРН, город
-        // document.getElementById('inn_or_ogrn').value = org.inn || org.ogrn;
-        // document.getElementById('city').value = org.address; // или вручную парсить
-
+        // При желании inn, address
         listEl.innerHTML = "";
       });
-      li.addEventListener('mouseover', () => {
-        li.style.backgroundColor = '#eee';
-      });
-      li.addEventListener('mouseout', () => {
-        li.style.backgroundColor = '#fff';
-      });
-
       listEl.appendChild(li);
     });
   } catch (err) {

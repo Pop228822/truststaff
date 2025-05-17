@@ -32,17 +32,22 @@ async def autocomplete_orgs(query: str = Query(..., min_length=2)):
         response = await client.post(url, headers=headers, json=json_data)
         data = response.json()
 
-    # Обрабатываем результат, оставляем нужные поля
-    # data["suggestions"] - список подсказок
     suggestions = []
     for item in data.get("suggestions", []):
-        # item["value"] - человекочитаемое название
-        # item["data"]["inn"], item["data"]["ogrn"], item["data"]["address"]["value"]
+        name = item["value"]  # "ООО "ТЕХНОСТРОЙ ЮГО-ВОСТОК""
+        inn = item["data"].get("inn", "")
+        address = item["data"].get("address", {}).get("value", "")
+
+        # Формируем общую строку
+        # Пример: "ООО "ТЕХНОСТРОЙ ЮГО-ВОСТОК"\n9721070113  г Москва..."
+        # Но т.к. \n в HTML будет не виден, можно через " — " или "<br>"
+        display = f'{name}\n{inn}  {address}'
+
         s = {
-            "value": item["value"],
-            "inn": item["data"].get("inn", ""),
-            "ogrn": item["data"].get("ogrn", ""),
-            "address": item["data"].get("address", {}).get("value", "")
+            "value": name,  # по-прежнему чистое название
+            "inn": inn,
+            "address": address,
+            "display": display,  # новая строка для вывода в подсказке
         }
         suggestions.append(s)
 
