@@ -398,3 +398,11 @@ button.reject {
     margin: 0 0.5rem;
 }
 
+#org-suggestions li {
+    padding: 0.5rem;
+    cursor: pointer;
+}
+
+#org-suggestions li:hover {
+    background-color: #eee; /* Серый фон при наведении */
+}

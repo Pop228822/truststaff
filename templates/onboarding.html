@@ -41,8 +41,9 @@
 <script>
 const inputEl = document.getElementById('company_name');
 const listEl = document.getElementById('org-suggestions');
+const cityEl = document.getElementById('city');
+const innEl = document.getElementById('inn_or_ogrn');
 
-// Чтобы избежать слишком частых запросов
 let timerId;
 
 inputEl.addEventListener('input', () => {
@@ -61,24 +62,24 @@ inputEl.addEventListener('input', () => {
 async function loadSuggestions(query) {
   try {
     const response = await fetch(`/autocomplete/orgs?query=${encodeURIComponent(query)}`);
-    const data = await response.json();  // { "results": [ ... ] }
+    const data = await response.json();
     listEl.innerHTML = "";
     data.results.forEach(org => {
       const li = document.createElement('li');
+      // Простой hover-стиль сделаем через CSS
 
-      // Если хотите просто одной строкой:
-      // li.textContent = `${org.value} — ${org.inn} ${org.address}`;
-      // Или используем заранее сформированную строку org.display
-      // Но \n не отображается в HTML. Нужно заменить на <br>:
+      // Формируем HTML
       const html = org.display.replace('\n', '<br>');
-      li.innerHTML = html; // тогда будет перенос
+      li.innerHTML = html;
 
       li.addEventListener('click', () => {
-        // Подставляем только название
-        inputEl.value = org.value;
-        // При желании inn, address
+        inputEl.value = org.value;  // Название
+        innEl.value = org.inn;      // ИНН
+        cityEl.value = org.address; // Или распарсить город
+
         listEl.innerHTML = "";
       });
+
       listEl.appendChild(li);
     });
   } catch (err) {
@@ -86,4 +87,5 @@ async function loadSuggestions(query) {
   }
 }
 </script>
+
 {% endblock %}
