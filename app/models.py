@@ -66,6 +66,7 @@ class PendingUser(SQLModel, table=True):
 
 
 class CheckLog(SQLModel, table=True):
+    __tablename__ = "check_log"
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
