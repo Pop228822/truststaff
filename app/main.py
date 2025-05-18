@@ -9,6 +9,7 @@ import pdfkit
 from sqlalchemy.orm import Session
 import shutil
 import os
+from app.limit import rate_limit_100_per_minute
 
 from app.auth import (
     hash_password,
@@ -20,9 +21,11 @@ from app.auth import (
     oauth2_scheme_optional
 )
 from app.database import get_session
-from app.models import ReputationRecord, User, Employee, PendingUser
+from app.models import ReputationRecord, User, Employee, PendingUser, RateLimit
 
-app = FastAPI()
+app = FastAPI(
+    dependencies=[Depends(rate_limit_100_per_minute)]
+)
 templates = Jinja2Templates(directory="templates")
 
 from app.auth import optional_user
@@ -508,6 +511,7 @@ async def not_found(request: Request, exc: HTTPException):
         {"request": request},
         status_code=404
     )
+
 
 from app.routes import autocomplete
 app.include_router(autocomplete.router)

@@ -70,3 +70,10 @@ class CheckLog(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class RateLimit(SQLModel, table=True):
+    __tablename__ = "rate_limit"
+    ip_address: str = Field(primary_key=True)
+    request_count: int
+    window_start: datetime
