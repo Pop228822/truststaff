@@ -2,11 +2,5 @@
 
 {% block content %}
 <h2>Сгенерировать согласие на обработку репутации</h2>
-<form method="post">
-    <label>Работодатель (по умолчанию: {{ user.name }}):<br>
-        <input type="text" name="employer_name" value="{{ user.name }}">
-    </label><br><br>
-    <button type="submit">Скачать PDF</button>
-</form>
 <p><a href="/employees">← Назад к сотрудникам</a></p>
 {% endblock %}

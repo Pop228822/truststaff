@@ -326,11 +326,14 @@ def consent_form(request: Request, employee_id: int, db: Session = Depends(get_s
 from fastapi.responses import StreamingResponse
 import io
 
+from fastapi import Form
+
 @app.post("/employee/{employee_id}/generate-consent")
 def generate_consent_pdf(
     request: Request,
     employee_id: int,
-    employer_name: str = Form(...),
+    employer_company_name: str = Form(...),
+    employer_inn: str = Form(...),
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
@@ -340,11 +343,13 @@ def generate_consent_pdf(
 
     env = Environment(loader=FileSystemLoader("templates"))
     template = env.get_template("consent_template.html")
+
     html_content = template.render(
         full_name=employee.full_name,
         birth_date=employee.birth_date,
         contact=employee.contact or "",
-        employer_name=employer_name,
+        employer_company_name=employer_company_name,
+        employer_inn=employer_inn,
         today=datetime.now().strftime("%d.%m.%Y")
     )
 
@@ -356,6 +361,7 @@ def generate_consent_pdf(
         media_type="application/pdf",
         headers={"Content-Disposition": f"attachment; filename=consent_{employee.id}.pdf"}
     )
+
 
 from app.auth import get_session_user
 
