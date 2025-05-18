@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.database import get_session
 from app.models import RateLimit
 
-MAX_REQUESTS_PER_MINUTE = 120
+MAX_REQUESTS_PER_MINUTE = 100
 
 
 async def rate_limit_100_per_minute(
