@@ -316,10 +316,25 @@ def add_record(
     return RedirectResponse(url="/employees", status_code=302)
 
 @app.get("/employee/{employee_id}/generate-consent", response_class=HTMLResponse)
-def consent_form(request: Request, employee_id: int, db: Session = Depends(get_session), current_user: User = Depends(only_approved_user)):
+def consent_form(
+    request: Request,
+    employee_id: int,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(only_approved_user)
+):
+    """
+    Шаблон, на котором есть форма для ввода employer_company_name, employer_inn
+    """
+    # Проверяем, что сотрудник существует
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Сотрудник не найден")
+
+    # Рендерим шаблон consent_form.html, передаём employee_id
     return templates.TemplateResponse("consent_form.html", {
         "request": request,
         "employee_id": employee_id,
+        "employee": employee,     # если нужно вывести ФИО и т.д.
         "user": current_user
     })
 
@@ -337,6 +352,9 @@ def generate_consent_pdf(
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
+    """
+    Обрабатывает POST-форму, генерирует PDF на основе consent_template.html
+    """
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Сотрудник не найден")
