@@ -2,18 +2,19 @@
 {% block content %}
 <h2>Сгенерировать согласие на обработку репутации</h2>
 
-<!-- Показываем ФИО сотрудника, если нужно -->
-<p>Сотрудник: {{ employee.full_name }} (id={{ employee_id }})</p>
+<p>Сотрудник: {{ employee.full_name }} (ID={{ employee_id }})</p>
 
 <form method="post" action="/employee/{{ employee_id }}/generate-consent">
     <div class="form-group">
         <label for="employer_company_name">Название организации:</label>
-        <input type="text" name="employer_company_name" required>
+        <input type="text" name="employer_company_name"
+               value="{{ default_company_name }}" required>
     </div>
 
     <div class="form-group">
         <label for="employer_inn">ИНН:</label>
-        <input type="text" name="employer_inn" required>
+        <input type="text" name="employer_inn"
+               value="{{ default_inn }}" required>
     </div>
 
     <button type="submit" class="big-button">Сформировать согласие</button>

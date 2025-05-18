@@ -322,21 +322,24 @@ def consent_form(
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
-    """
-    Шаблон, на котором есть форма для ввода employer_company_name, employer_inn
-    """
-    # Проверяем, что сотрудник существует
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Сотрудник не найден")
 
-    # Рендерим шаблон consent_form.html, передаём employee_id
+    # При желании можно проверить, заполнены ли company_name / inn_or_ogrn,
+    # но обычно просто пробрасываем напрямую:
+    default_company_name = current_user.company_name or ""
+    default_inn = current_user.inn_or_ogrn or ""
+
     return templates.TemplateResponse("consent_form.html", {
         "request": request,
         "employee_id": employee_id,
-        "employee": employee,     # если нужно вывести ФИО и т.д.
-        "user": current_user
+        "employee": employee,
+        "user": current_user,
+        "default_company_name": default_company_name,
+        "default_inn": default_inn
     })
+
 
 from fastapi.responses import StreamingResponse
 import io
