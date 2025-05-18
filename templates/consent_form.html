@@ -2,5 +2,10 @@
 
 {% block content %}
 <h2>Сгенерировать согласие на обработку репутации</h2>
+<div style="margin: 1rem 0;">
+    <a href="/employee/{{ employee.id }}/generate-consent-form" class="big-button">
+        Создать согласие
+    </a>
+</div>
 <p><a href="/employees">← Назад к сотрудникам</a></p>
 {% endblock %}
