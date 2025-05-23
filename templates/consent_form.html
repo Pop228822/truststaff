@@ -7,14 +7,18 @@
 <form method="post" action="/employee/{{ employee_id }}/generate-consent">
     <div class="form-group">
         <label for="employer_company_name">Название организации:</label>
-        <input type="text" name="employer_company_name"
-               value="{{ default_company_name }}" required>
+        <input  id="employer_company_name"
+            name="employer_company_name"
+            type="text"
+            value="{{ default_company_name }}" required>
     </div>
 
     <div class="form-group">
         <label for="employer_inn">ИНН:</label>
-        <input type="text" name="employer_inn"
-               value="{{ default_inn }}" required>
+        <input  id="employer_inn"
+            name="employer_inn"
+            type="text"
+            value="{{ default_inn }}" required>
     </div>
 
     <button type="submit" class="big-button">Сформировать согласие</button>
