@@ -1,8 +1,16 @@
 from fastapi import Request
-from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.types import ASGIApp
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
+    def __init__(self, app: ASGIApp) -> None:
+        super().__init__(app)
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: RequestResponseEndpoint
+    ):
         response = await call_next(request)
 
         response.headers["X-Frame-Options"] = "SAMEORIGIN"

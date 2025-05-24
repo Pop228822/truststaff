@@ -27,8 +27,8 @@ from security_headers import SecurityHeadersMiddleware
 app = FastAPI(
     dependencies=[Depends(rate_limit_100_per_minute)]
 )
-templates = Jinja2Templates(directory="templates")
 app.add_middleware(SecurityHeadersMiddleware)
+templates = Jinja2Templates(directory="templates")
 from app.auth import optional_user
 
 MAX_EMPLOYERS_COUNT = 30
