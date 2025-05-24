@@ -21,13 +21,14 @@ from app.auth import (
     oauth2_scheme_optional
 )
 from app.database import get_session
-from app.models import ReputationRecord, User, Employee, PendingUser, RateLimit
+from app.models import ReputationRecord, User, Employee, PendingUser
+from security_headers import SecurityHeadersMiddleware
 
 app = FastAPI(
     dependencies=[Depends(rate_limit_100_per_minute)]
 )
 templates = Jinja2Templates(directory="templates")
-
+app.add_middleware(SecurityHeadersMiddleware)
 from app.auth import optional_user
 
 MAX_EMPLOYERS_COUNT = 30
