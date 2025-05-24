@@ -22,7 +22,7 @@ from app.auth import (
 )
 from app.database import get_session
 from app.models import ReputationRecord, User, Employee, PendingUser
-from security_headers import SecurityHeadersMiddleware
+from app.security_headers import SecurityHeadersMiddleware
 
 app = FastAPI(
     dependencies=[Depends(rate_limit_100_per_minute)]
