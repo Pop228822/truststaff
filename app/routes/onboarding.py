@@ -80,6 +80,17 @@ def submit_onboarding(
     if user.verification_status == "approved":
         return RedirectResponse("/", status_code=302)
 
+    _, ext = os.path.splitext(passport_file.filename)
+    ext = ext.lower().lstrip(".")
+
+    if ext not in ALLOWED_EXTENSIONS:
+        return templates.TemplateResponse("onboarding.html", {
+            "request": request,
+            "user": current_user,
+            "error_message": f"Недопустимый формат файла: .{ext}. "
+                             f"Разрешено: {', '.join(ALLOWED_EXTENSIONS)}."
+        })
+
     MAX_MB = 5
     MAX_SIZE = MAX_MB * 1024 * 1024  # 5 MB в байтах
 
