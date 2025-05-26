@@ -543,12 +543,29 @@ button.reject {
     color: #e74c3c;
 }
 
-.recaptcha-wrapper {
+.recaptcha-box {
     width: 100%;
+    min-height: 100px;
+    margin: 0 auto 1.5rem auto;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 78px;
-    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 10;
+    background: none !important;
+    padding: 0 !important;
 }
+
+.g-recaptcha {
+    min-width: 304px !important;
+    min-height: 78px !important;
+    background: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    display: block !important;
+    position: relative !important;
+    z-index: 11 !important;
+}
+
 
