@@ -9,7 +9,6 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pdfkit
 from sqlalchemy.orm import Session
-import shutil
 import os
 from app.limit import rate_limit_100_per_minute
 load_dotenv()
@@ -411,97 +410,8 @@ def generate_consent_pdf(
         headers={"Content-Disposition": f"attachment; filename=consent_{employee.id}.pdf"}
     )
 
-
-from app.auth import get_session_user
-
-@app.get("/onboarding", response_class=HTMLResponse)
-def onboarding_form(request: Request, current_user: User = Depends(get_session_user)):
-    if not current_user:
-        return RedirectResponse("/login", status_code=302)
-    if current_user and current_user.verification_status == "approved":
-        return RedirectResponse("/", status_code=302)
-    if current_user.verification_status == "pending":
-        # Можно вернуть шаблон "onboarding_pending.html" или показать сообщение
-        return templates.TemplateResponse("onboarding_pending.html", {
-            "request": request,
-            "user": current_user
-        })
-    return templates.TemplateResponse("onboarding.html", {"request": request, "user": current_user})
-
-@app.post("/onboarding")
-def submit_onboarding(
-    request: Request,
-    company_name: str = Form(...),
-    city: str = Form(...),
-    inn_or_ogrn: str = Form(...),
-    passport_file: UploadFile = File(...),
-    db: Session = Depends(get_session),
-    current_user: User = Depends(get_session_user)
-):
-
-    user = db.query(User).filter(User.id == current_user.id).first()
-    if user.verification_status == "pending":
-        return templates.TemplateResponse("onboarding_pending.html", {
-            "request": request,
-            "user": user,
-            "message": "Ваша заявка уже на рассмотрении. Повторно отправлять не нужно."
-        })
-
-    if user.verification_status == "approved":
-        return RedirectResponse("/", status_code=302)
-
-    MAX_MB = 5
-    MAX_SIZE = MAX_MB * 1024 * 1024  # 5 MB в байтах
-
-    # Определяем размер
-    passport_file.file.seek(0, 2)  # Перемещаем указатель в конец файла
-    file_size = passport_file.file.tell()  # Считываем позицию (размер)
-    passport_file.file.seek(0)  # Возвращаемся в начало файла
-
-    if file_size > MAX_SIZE:
-        # Превышен лимит — возвращаем шаблон или выбрасываем ошибку
-        return templates.TemplateResponse("onboarding.html", {
-            "request": request,
-            "user": current_user,
-            "error_message": f"Файл превышает {MAX_MB} МБ. Попробуйте другой документ."
-        })
-
-    filename = f"passport_{current_user.id}_{passport_file.filename}"
-    filepath = os.path.join("static", "uploads", filename)
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    with open(filepath, "wb") as buffer:
-        shutil.copyfileobj(passport_file.file, buffer)
-
-    user = db.query(User).filter(User.id == current_user.id).first()
-    user.company_name = company_name
-    user.city = city
-    user.inn_or_ogrn = inn_or_ogrn
-    user.passport_filename = filename
-    user.verification_status = "pending"
-    user.rejection_reason = None
-    db.commit()
-
-    return templates.TemplateResponse("onboarding_submitted.html", {"request": request})
-
-@app.get("/record/{record_id}/edit", response_class=HTMLResponse)
-def edit_record_form(
-    record_id: int,
-    request: Request,
-    db: Session = Depends(get_session),
-    current_user: User = Depends(only_approved_user)
-):
-    record = db.query(ReputationRecord).filter(
-        ReputationRecord.id == record_id,
-        ReputationRecord.employer_id == current_user.id
-    ).first()
-    if not record:
-        raise HTTPException(status_code=404)
-
-    return templates.TemplateResponse("edit_record.html", {
-        "request": request,
-        "record": record
-    })
-
+from routes.onboarding import router as onboarding_router
+app.include_router(onboarding_router)
 
 @app.post("/record/{record_id}/edit")
 def edit_record(
