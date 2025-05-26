@@ -545,11 +545,20 @@ button.reject {
 }
 
 .g-recaptcha {
-    display: block !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
     min-height: 78px !important;
-    min-width: 300px !important;
+    min-width: 304px !important;
+    margin: 0 auto 1.5rem auto !important;
+    padding: 0 !important;
+    border: none !important;
     background: none !important;
-    z-index: 1 !important;
+    position: relative !important;
+    z-index: 2 !important;
+}
+
+form {
+    position: relative;
     overflow: visible !important;
-    margin: 0 auto 1rem auto !important;
 }
