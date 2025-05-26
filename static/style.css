@@ -222,7 +222,6 @@ button.reject {
 
 .record-form a:hover {
     text-decoration: underline;
-    overflow: visible !important;
 }
 
 .employee-cards {
@@ -544,21 +543,12 @@ button.reject {
     color: #e74c3c;
 }
 
-.g-recaptcha {
-    display: flex !important;
-    justify-content: center !important;
-    align-items: center !important;
-    min-height: 78px !important;
-    min-width: 304px !important;
-    margin: 0 auto 1.5rem auto !important;
-    padding: 0 !important;
-    border: none !important;
-    background: none !important;
-    position: relative !important;
-    z-index: 2 !important;
+.recaptcha-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 78px;
+    margin-bottom: 1.5rem;
 }
 
-form {
-    position: relative;
-    overflow: visible !important;
-}
