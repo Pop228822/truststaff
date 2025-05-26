@@ -39,7 +39,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             f"style-src 'self' 'nonce-{nonce}'; "
             f"img-src 'self' data:; "
             f"font-src 'self'; "
-            f"connect-src 'self'; "
+            f"connect-src 'self' https://www.google.com https://www.gstatic.com;"
             f"frame-ancestors 'self';"
         )
 
