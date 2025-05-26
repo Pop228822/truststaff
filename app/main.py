@@ -1,4 +1,6 @@
 from datetime import datetime
+
+from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 from typing import Optional
 
@@ -10,7 +12,7 @@ from sqlalchemy.orm import Session
 import shutil
 import os
 from app.limit import rate_limit_100_per_minute
-
+load_dotenv()
 from app.auth import (
     hash_password,
     verify_password,
