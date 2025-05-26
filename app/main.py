@@ -410,8 +410,8 @@ def generate_consent_pdf(
         headers={"Content-Disposition": f"attachment; filename=consent_{employee.id}.pdf"}
     )
 
-from routes.onboarding import router as onboarding_router
-app.include_router(onboarding_router)
+from app.routes import onboarding
+app.include_router(onboarding.router)
 
 @app.post("/record/{record_id}/edit")
 def edit_record(
