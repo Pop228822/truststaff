@@ -7,13 +7,13 @@
 
     <ul>
         {% for u in users %}
-        <li style="margin: 0.5rem 0;">
+        <li class="user-list-item">
             <strong>ID:</strong> {{ u.id }} |
             <strong>Email:</strong> {{ u.email }} |
             <strong>Верификация:</strong> {{ u.verification_status }}<br>
 
             <!-- Ссылка на детальную страницу этого пользователя -->
-            <a href="/admin/user/{{ u.id }}" style="color: #3498db;">
+            <a href="/admin/user/{{ u.id }}" class="link-blue">
                 Подробнее
             </a>
         </li>

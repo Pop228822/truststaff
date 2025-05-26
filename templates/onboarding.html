@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="record-form">
-    <h2 style="text-align: center;">Верификация работодателя</h2>
+    <!-- Вместо style="text-align: center;" -->
+    <h2 class="text-center">Верификация работодателя</h2>
+
     <form method="post" enctype="multipart/form-data">
         <div class="form-group">
             <label for="company_name">Название компании / ИП</label>
@@ -9,7 +11,8 @@
             <input type="text" name="company_name" id="company_name" required>
 
             <!-- Список для подсказок -->
-            <ul id="org-suggestions" style="margin-top: 0.5rem; border: 1px solid #ccc; border-radius: 4px; list-style: none; max-height: 200px; overflow-y: auto; padding: 0;"></ul>
+            <!-- Вместо инлайн-стилей => класс "suggestions-list" -->
+            <ul id="org-suggestions" class="suggestions-list"></ul>
         </div>
 
         <div class="form-group">
@@ -28,64 +31,15 @@
         </div>
 
         {% if error_message %}
-            <p style="color: red; font-weight: bold;">{{ error_message }}</p>
+            <!-- Вместо style="color: red; font-weight: bold;" -->
+            <p class="text-red fw-bold">{{ error_message }}</p>
         {% endif %}
 
-        <div style="text-align: center;">
+        <!-- Вместо style="text-align: center;" -->
+        <div class="text-center">
             <button type="submit" class="big-button">Отправить на проверку</button>
         </div>
     </form>
 </div>
 
-<!-- Скрипт в самом низу, чтобы элементы были доступны -->
-<script>
-const inputEl = document.getElementById('company_name');
-const listEl = document.getElementById('org-suggestions');
-const cityEl = document.getElementById('city');
-const innEl = document.getElementById('inn_or_ogrn');
-
-let timerId;
-
-inputEl.addEventListener('input', () => {
-  const query = inputEl.value.trim();
-  if (query.length < 2) {
-    listEl.innerHTML = "";
-    return;
-  }
-
-  clearTimeout(timerId);
-  timerId = setTimeout(() => {
-    loadSuggestions(query);
-  }, 300);
-});
-
-async function loadSuggestions(query) {
-  try {
-    const response = await fetch(`/autocomplete/orgs?query=${encodeURIComponent(query)}`);
-    const data = await response.json();
-    listEl.innerHTML = "";
-    data.results.forEach(org => {
-      const li = document.createElement('li');
-      // Простой hover-стиль сделаем через CSS
-
-      // Формируем HTML
-      const html = org.display.replace('\n', '<br>');
-      li.innerHTML = html;
-
-      li.addEventListener('click', () => {
-        inputEl.value = org.value;  // Название
-        innEl.value = org.inn;      // ИНН
-        cityEl.value = org.address; // Или распарсить город
-
-        listEl.innerHTML = "";
-      });
-
-      listEl.appendChild(li);
-    });
-  } catch (err) {
-    console.error(err);
-  }
-}
-</script>
-
-{% endblock %}
+<script src="/static/js/autocomplete.js"></script>

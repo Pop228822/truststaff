@@ -406,3 +406,139 @@ button.reject {
 #org-suggestions li:hover {
     background-color: #eee; /* Серый фон при наведении */
 }
+
+.fw-bold {
+    font-weight: bold;
+}
+
+/* Стили для блока подсказок (org-suggestions) */
+.suggestions-list {
+    margin-top: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    list-style: none;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.error-text {
+    color: red;
+    font-weight: bold;
+}
+
+.inline-form {
+    display: inline;
+}
+.inline-block-form {
+    display: inline-block;
+    margin-top: 4px;
+}
+
+.error-reason {
+    color: #b03b3b;
+}
+.mb-1rem {
+    margin-bottom: 1rem;
+}
+.mb-075rem {
+    margin-bottom: 0.75rem;
+}
+
+.user-list-item {
+    margin: 0.5rem 0;
+}
+.link-blue {
+    color: #3498db;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+}
+
+.mt-2rem {
+    margin-top: 2rem;
+}
+
+.mt-1_5rem {
+    margin-top: 1.5rem;
+}
+
+.mt-0_5rem {
+    margin-top: 0.5rem;
+}
+
+.mt-1rem {
+    margin-top: 1rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-green {
+    color: green;
+}
+
+.text-orange {
+    color: orange;
+}
+
+.text-red {
+    color: red;
+}
+
+/* Дополнительный цвет #b03b3b */
+.text-darkred {
+    color: #b03b3b;
+}
+
+.text-gray {
+    color: gray;
+}
+
+
+.text-white {
+    color: white;
+}
+.my-2rem {
+    margin: 2rem 0;
+}
+
+.fw-500 {
+    font-weight: 500;
+}
+.fs-italic {
+    font-style: italic;
+}
+.text-darkblue {
+    color: #2c3e50;
+}
+
+.link-underline {
+    text-decoration: underline;
+}
+
+.fs-1_1rem {
+    font-size: 1.1rem;
+}
+
+.mb-0_5rem {
+    margin-bottom: 0.5rem;
+}
+
+.registration-success {
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.verify-email-container {
+    max-width: 600px;
+    margin: 2rem auto;
+    text-align: center;
+}
+.text-error {
+    color: #e74c3c;
+}

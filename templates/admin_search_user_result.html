@@ -15,7 +15,7 @@
     <p><strong>Роль:</strong> {{ found_user.role }}</p>
     <p><strong>Статус верификации:</strong> {{ found_user.verification_status }}</p>
     {% if found_user.verification_status == "rejected" and found_user.rejection_reason %}
-        <p style="color: #b03b3b;">
+        <p class="error-reason">
             <em>Причина отказа: {{ found_user.rejection_reason }}</em>
         </p>
     {% endif %}
@@ -37,7 +37,7 @@
     {% if employees %}
         <ul>
             {% for emp in employees %}
-                <li style="margin-bottom: 1rem;">
+                <li class="mb-1rem">
                     <strong>ФИО сотрудника:</strong> {{ emp.full_name }}<br>
                     <strong>Дата рождения:</strong> {{ emp.birth_date }}<br>
                     <strong>Контакт:</strong> {{ emp.contact if emp.contact else "Нет данных" }}<br>
@@ -48,7 +48,7 @@
                         <strong>Записи по сотруднику:</strong>
                         <ul>
                             {% for r in emp.records %}
-                                <li style="margin-bottom: 0.75rem;">
+                                <li class="mb-075rem">
                                     <strong>Record ID:</strong> {{ r.id }},
                                     <strong>Добавлено:</strong> {{ r.created_at }}<br>
                                     <strong>Должность:</strong> {{ r.position }}<br>

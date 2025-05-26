@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="record-form">
     <h2>Заявка на верификацию</h2>
     <p>Ваша заявка уже находится на рассмотрении.</p>
 
     {% if message %}
-        <p style="color: #2c3e50; font-weight: bold;">{{ message }}</p>
+        <p class="text-darkblue fw-bold">{{ message }}</p>
     {% endif %}
 
     <p><a href="/">На главную</a></p>

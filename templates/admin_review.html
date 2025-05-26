@@ -32,10 +32,10 @@
                         {% endif %}
                     </td>
                     <td>
-                        <form method="post" action="/admin/approve/{{ u.id }}" style="display:inline">
+                        <form method="post" action="/admin/approve/{{ u.id }}" class="inline-form">
                             <button>✅</button>
                         </form>
-                        <form method="post" action="/admin/reject/{{ u.id }}" style="display:inline-block; margin-top: 4px;">
+                        <form method="post" action="/admin/reject/{{ u.id }}" class="inline-block-form">
                             <textarea name="rejection_reason" placeholder="Причина" rows="2" cols="20" required></textarea><br>
                             <button>❌ Отклонить</button>
                         </form>

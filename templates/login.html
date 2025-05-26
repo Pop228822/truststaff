@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="record-form">
-    <h2 style="text-align:center;">Вход в аккаунт</h2>
+
+    <h2 class="text-center">Вход в аккаунт</h2>
+
     <form method="post">
         <div class="form-group">
             <label for="email">Email</label>
@@ -14,22 +16,24 @@
         </div>
 
         {% if error %}
-            <p style="color: red; text-align:center;"><em>{{ error }}</em></p>
+            <p class="text-center text-red">
+                <em>{{ error }}</em>
+            </p>
         {% endif %}
 
-        <div style="text-align: center;">
+        <div class="text-center">
             <button type="submit" class="big-button">Войти</button>
         </div>
     </form>
 
     <!-- Ссылка для восстановления пароля -->
-    <div style="text-align: center; margin-top: 1rem;">
-        <a href="/forgot-password" style="text-decoration: underline;">Забыли пароль?</a>
+    <div class="text-center mt-1rem">
+        <a href="/forgot-password" class="link-underline">Забыли пароль?</a>
     </div>
 
-    <div style="margin-top: 2rem; text-align: center;">
-        <p style="margin-bottom: 0.75rem;">Впервые у нас?</p>
-        <a href="/register" class="big-button" style="color: white;">Зарегистрироваться</a>
+    <div class="text-center mt-2rem">
+        <p class="mb-0_75rem">Впервые у нас?</p>
+        <a href="/register" class="big-button text-white">Зарегистрироваться</a>
     </div>
 </div>
 {% endblock %}
