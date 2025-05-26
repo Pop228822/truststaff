@@ -542,3 +542,12 @@ button.reject {
 .text-error {
     color: #e74c3c;
 }
+
+.g-recaptcha {
+    min-height: 78px !important;
+    min-width: 300px !important;
+    display: block !important;
+    z-index: 10 !important;
+    background: none !important;
+    overflow: visible !important;
+}
