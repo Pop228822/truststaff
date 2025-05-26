@@ -545,10 +545,11 @@ button.reject {
 }
 
 .g-recaptcha {
+    display: block !important;
     min-height: 78px !important;
     min-width: 300px !important;
-    display: block !important;
-    z-index: 10 !important;
     background: none !important;
+    z-index: 1 !important;
     overflow: visible !important;
+    margin: 0 auto 1rem auto !important;
 }
