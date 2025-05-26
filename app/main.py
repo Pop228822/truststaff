@@ -162,7 +162,7 @@ def login_user(
     request: Request,
     email: str = Form(...),
     password: str = Form(...),
-    g_recaptcha_response: str = Form(...),
+    g_recaptcha_response: str = Form(..., alias="g-recaptcha-response"),
     session: Session = Depends(get_session)
 ):
     ip = request.client.host
