@@ -203,12 +203,20 @@ import requests
 
 def verify_recaptcha(token: str) -> bool:
     secret = os.getenv("SECRET_CAPTCHA_KEY")
-    resp = requests.post(
-        "https://www.google.com/recaptcha/api/siteverify",
-        data={'secret': secret, 'response': token}
-    )
-    result = resp.json()
-    return result.get('success', False)
+    if not secret:
+        # Можно raise, но обычно просто не пускаем
+        return False
+    try:
+        resp = requests.post(
+            "https://www.google.com/recaptcha/api/siteverify",
+            data={'secret': secret, 'response': token},
+            timeout=3
+        )
+        result = resp.json()
+        return result.get('success', False)
+    except Exception as e:
+        # print(f"reCAPTCHA error: {e}")
+        return False
 
 @app.get("/logout")
 def logout():
