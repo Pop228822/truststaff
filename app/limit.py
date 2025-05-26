@@ -6,7 +6,6 @@ from app.models import RateLimit
 
 MAX_REQUESTS_PER_MINUTE = 100
 
-
 async def rate_limit_100_per_minute(
         request: Request,
         db: Session = Depends(get_session),

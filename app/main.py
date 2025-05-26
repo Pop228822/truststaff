@@ -162,6 +162,7 @@ def login_user(
     request: Request,
     email: str = Form(...),
     password: str = Form(...),
+    g_recaptcha_response: str = Form(...),
     session: Session = Depends(get_session)
 ):
     ip = request.client.host
@@ -170,6 +171,12 @@ def login_user(
         return templates.TemplateResponse("login.html", {
             "request": request,
             "error": "Слишком много попыток входа. Попробуйте через 15 минут."
+        })
+
+    if not verify_recaptcha(g_recaptcha_response):
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "error": "Подтвердите, что вы не робот"
         })
 
     user = session.query(User).filter(User.email == email).first()
@@ -187,11 +194,21 @@ def login_user(
         })
 
     log_login_attempt(session, email, ip, True)
-
     token = create_access_token({"sub": str(user.id)})
     response = RedirectResponse("/", status_code=302)
     response.set_cookie(key="access_token", value=token, httponly=True, secure=True, samesite="lax")
     return response
+
+import requests
+
+def verify_recaptcha(token: str) -> bool:
+    secret = os.getenv("SECRET_CAPTCHA_KEY")
+    resp = requests.post(
+        "https://www.google.com/recaptcha/api/siteverify",
+        data={'secret': secret, 'response': token}
+    )
+    result = resp.json()
+    return result.get('success', False)
 
 @app.get("/logout")
 def logout():
