@@ -35,7 +35,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Подставляем сгенерированный nonce в script-src и style-src
         response.headers["Content-Security-Policy"] = (
             f"default-src 'self'; "
-            f"script-src 'self' 'nonce-{nonce}'; "
+            f"script-src 'self' https://www.google.com https://www.gstatic.com 'nonce-{nonce}'; "
             f"style-src 'self' 'nonce-{nonce}'; "
             f"img-src 'self' data:; "
             f"font-src 'self'; "
