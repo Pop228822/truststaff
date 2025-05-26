@@ -222,6 +222,7 @@ button.reject {
 
 .record-form a:hover {
     text-decoration: underline;
+    overflow: visible !important;
 }
 
 .employee-cards {
