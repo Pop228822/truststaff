@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="32" height="32" viewBox="0 0 24 24" fill="none">
+
+  <style>
+    /* Светлая тема — белый фон, синий щит */
+    .bg   { fill:#ffffff }
+    .mark { fill:#0A48FF }
+
+    /* Тёмная тема — чёрный фон, ярко-синий щит */
+    @media (prefers-color-scheme: dark) {
+      .bg   { fill:#000000 }
+      .mark { fill:#0096FF }
+    }
+  </style>
+
+  <!-- фон-круг (уберите, если нужен полностью прозрачный favicon) -->
+  <circle class="bg" cx="12" cy="12" r="12"/>
+
+  <!-- щит -->
+  <path class="mark"
+        d="M12 2 4 5.5v5.5c0 4.7 3.1 9 8 10 4.9-1 8-5.3 8-10V5.5L12 2z"/>
+
+  <!-- галочка -->
+  <polyline points="8.5 12.5 11 15 15.5 10.5"
+            fill="none" stroke="#ffffff" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
