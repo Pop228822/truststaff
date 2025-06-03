@@ -34,14 +34,30 @@
                 <p><strong>Нарушений:</strong> {{ emp.record_count }}</p>
 
                 {% for r in emp.records %}
-                    <div class="record-block">
-                        <p><strong>📌 Должность:</strong> {{ r.position }}</p>
-                        <p><strong>🗓 Принят:</strong> {{ r.hired_at }}
-                        {% if r.fired_at %} → <strong>Уволен:</strong> {{ r.fired_at }}{% endif %}</p>
-                        {% if r.commendation %}<p><strong>👍 Похвала:</strong> {{ r.commendation }}</p>{% endif %}
-                        {% if r.misconduct %}<p><strong>⚠ Нарушения:</strong> {{ r.misconduct }}</p>{% endif %}
-                        {% if r.dismissal_reason %}<p><strong>🚪 Причина увольнения:</strong> {{ r.dismissal_reason }}</p>{% endif %}
-                    </div>
+                    {% if r.is_blocked_employer %}
+                        <!-- Если работодатель заблокирован -->
+                        <div class="record-block" style="color: red;">
+                            <p>🔒 Предприниматель заблокирован, отзыв неактуален.</p>
+                        </div>
+                    {% else %}
+                        <!-- Обычные данные о нарушениях/похвалах -->
+                        <div class="record-block">
+                            <p><strong>📌 Должность:</strong> {{ r.position }}</p>
+                            <p><strong>🗓 Принят:</strong> {{ r.hired_at }}
+                            {% if r.fired_at %}
+                                → <strong>Уволен:</strong> {{ r.fired_at }}
+                            {% endif %}</p>
+                            {% if r.commendation %}
+                                <p><strong>👍 Похвала:</strong> {{ r.commendation }}</p>
+                            {% endif %}
+                            {% if r.misconduct %}
+                                <p><strong>⚠ Нарушения:</strong> {{ r.misconduct }}</p>
+                            {% endif %}
+                            {% if r.dismissal_reason %}
+                                <p><strong>🚪 Причина увольнения:</strong> {{ r.dismissal_reason }}</p>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         {% endfor %}

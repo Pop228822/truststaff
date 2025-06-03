@@ -49,7 +49,6 @@ def check_employee(
     ).scalar()
 
     if count_today >= 20:
-        # Лимит исчерпан
         return templates.TemplateResponse("check.html", {
             "request": request,
             "result": None,
@@ -67,13 +66,38 @@ def check_employee(
 
     employees = query.all()
     result = []
+
     for emp in employees:
         records = db.query(ReputationRecord).filter(ReputationRecord.employee_id == emp.id).all()
+        prepared_records = []
+        for record in records:
+            # Проверяем работодателя, который оставил запись (record.employer_id)
+            employer = db.query(User).get(record.employer_id)
+
+            if employer.is_blocked:
+                # Если работодатель заблокирован, выводим сообщение вместо данных
+                prepared_records.append({
+                    "is_blocked_employer": True,
+                    "blocked_message": "Предприниматель заблокирован, отзыв неактуален."
+                })
+            else:
+                # Обычная информация
+                prepared_records.append({
+                    "is_blocked_employer": False,
+                    "employer_id": record.employer_id,
+                    "position": record.position,
+                    "hired_at": record.hired_at,
+                    "fired_at": record.fired_at,
+                    "misconduct": record.misconduct,
+                    "dismissal_reason": record.dismissal_reason,
+                    "commendation": record.commendation,
+                })
+
         result.append({
             "full_name": emp.full_name,
             "birth_date": emp.birth_date,
-            "record_count": len(records),
-            "records": records
+            "records": prepared_records,
+            "record_count": len(prepared_records)
         })
 
     return templates.TemplateResponse("check.html", {
@@ -81,4 +105,5 @@ def check_employee(
         "result": result,
         "user": current_user
     })
+
 
