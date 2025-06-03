@@ -38,7 +38,7 @@
 
 {% endif %}
 
-{% if user and user.role == 'admin' %}
+{% if user and (user.role == 'admin' or user.role == 'superadmin') %}
     <p><a href="/admin/review" class="big-button">Проверить заявки на верификацию</a></p>
     <p><a href="/admin/search/user" class="big-button">Посмотреть информацию о пользователе</a></p>
     <p><a href="/admin/users/list" class="big-button">Посмотреть список пользователей</a></p>
