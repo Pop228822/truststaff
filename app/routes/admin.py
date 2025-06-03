@@ -135,7 +135,8 @@ def admin_users_list(
         "skip": skip,
         "limit": limit,
         "has_more": has_more,
-        "total_count": total_count
+        "total_count": total_count,
+        "current_user": current_user
     })
 
 

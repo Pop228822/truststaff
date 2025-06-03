@@ -16,6 +16,19 @@
             <a href="/admin/user/{{ u.id }}" class="link-blue">
                 Подробнее
             </a>
+             {% if current_user.role == "superadmin" %}
+                {% if u.is_blocked %}
+                    <!-- Если пользователь заблокирован -->
+                    <form method="post" action="/superadmin/unblock/{{ u.id }}" style="display:inline;">
+                        <button type="submit" class="big-button">Разблокировать</button>
+                    </form>
+                {% else %}
+                    <!-- Если пользователь НЕ заблокирован -->
+                    <form method="post" action="/superadmin/block/{{ u.id }}" style="display:inline;">
+                        <button type="submit" class="big-button danger">Заблокировать</button>
+                    </form>
+                {% endif %}
+            {% endif %}
         </li>
         {% endfor %}
     </ul>

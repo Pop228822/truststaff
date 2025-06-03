@@ -28,9 +28,12 @@ from app.security_headers import SecurityHeadersMiddleware
 app = FastAPI(
     dependencies=[Depends(rate_limit_100_per_minute)]
 )
+
 app.add_middleware(SecurityHeadersMiddleware)
 templates = Jinja2Templates(directory="templates")
 from app.auth import optional_user
+from app.routes import superadmin
+app.include_router(superadmin.router)
 
 MAX_EMPLOYERS_COUNT = 30
 
@@ -186,6 +189,12 @@ def login_user(
         return templates.TemplateResponse("login.html", {
             "request": request,
             "error": "Неверный логин или пароль"
+        })
+
+    if user.is_blocked:
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "error": "Ваш аккаунт заблокирован администратором."
         })
 
     if not user.is_email_verified:
