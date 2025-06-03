@@ -15,7 +15,7 @@ templates = Jinja2Templates(directory="templates")
 def ensure_admin(current_user: User = Depends(get_current_user)) -> User:
     if current_user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    if current_user.role != "admin":
+    if current_user.role != "admin" and current_user.role != "superadmin":
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return current_user
 
