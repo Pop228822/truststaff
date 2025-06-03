@@ -44,6 +44,11 @@ def onboarding_form(
     if not current_user:
         return RedirectResponse("/login", status_code=302)
 
+    if current_user.is_blocked:
+        response = RedirectResponse("/login", status_code=302)
+        response.delete_cookie("access_token")
+        return response
+
     if current_user.verification_status == "approved":
         return RedirectResponse("/", status_code=302)
 

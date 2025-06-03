@@ -238,6 +238,8 @@ def logout():
 def add_employee_form(request: Request, current_user: User = Depends(get_session_user)):
     if not current_user:
         return RedirectResponse("/login", status_code=302)
+    if current_user.is_blocked:
+        raise HTTPException(status_code=403, detail="Ваш аккаунт заблокирован.")
     if current_user.verification_status != "approved":
         return RedirectResponse("/onboarding", status_code=302)
     return templates.TemplateResponse("add_employee.html", {"request": request})

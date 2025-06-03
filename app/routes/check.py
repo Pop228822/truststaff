@@ -18,6 +18,11 @@ def check_form(
     request: Request,
     current_user: Optional[User] = Depends(get_session_user)
 ):
+    if current_user.is_blocked:
+        response = RedirectResponse("/login", status_code=302)
+        response.delete_cookie("access_token")
+        return response
+
     if not current_user:
         return RedirectResponse("/login", status_code=302)
     return templates.TemplateResponse("check.html", {"request": request, "result": None, "user": current_user})

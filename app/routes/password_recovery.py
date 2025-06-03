@@ -27,6 +27,11 @@ def forgot_password_send(
 ):
     user = db.query(User).filter(User.email == email).first()
 
+    if user.is_blocked:
+        return templates.TemplateResponse("forgot_password.html", {
+            "request": request,
+            "message": "Пользователь заблокирован!"
+        })
     # Чтобы не указывать, что пользователя нет, возвращаем "Письмо отправлено".
     if not user:
         return templates.TemplateResponse("forgot_password.html", {
