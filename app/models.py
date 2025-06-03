@@ -20,8 +20,7 @@ class User(SQLModel, table=True):
     is_email_verified: bool = Field(default=False)
     email_verification_token: Optional[str] = None
     password_reset_requested_at: Optional[datetime] = None
-    is_blocked = Field(default=False)
-
+    is_blocked: bool = Field(default=False)
 
 class Employee(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
