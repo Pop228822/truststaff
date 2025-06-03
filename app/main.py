@@ -239,7 +239,9 @@ def add_employee_form(request: Request, current_user: User = Depends(get_session
     if not current_user:
         return RedirectResponse("/login", status_code=302)
     if current_user.is_blocked:
-        raise HTTPException(status_code=403, detail="Ваш аккаунт заблокирован.")
+        response = RedirectResponse(url="/login", status_code=302)
+        response.delete_cookie("access_token")
+        return response
     if current_user.verification_status != "approved":
         return RedirectResponse("/onboarding", status_code=302)
     return templates.TemplateResponse("add_employee.html", {"request": request})
@@ -299,6 +301,10 @@ def list_employees(
     db: Session = Depends(get_session),
     current_user: User = Depends(enforce_login_and_verification)
 ):
+    if current_user.is_blocked:
+        response = RedirectResponse(url="/login", status_code=302)
+        response.delete_cookie("access_token")
+        return response
     employees = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).all()
     for emp in employees:
         emp.records = db.query(ReputationRecord).filter(ReputationRecord.employee_id == emp.id).all()
@@ -324,6 +330,10 @@ def add_record(
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
+    if current_user.is_blocked:
+        response = RedirectResponse(url="/login", status_code=302)
+        response.delete_cookie("access_token")
+        return response
     # Считаем, сколько записей ReputationRecord уже есть у текущего пользователя по этому сотруднику
     existing_records_count = db.query(ReputationRecord).filter(
         ReputationRecord.employee_id == employee_id,
@@ -436,6 +446,10 @@ def edit_record(
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
+    if current_user.is_blocked:
+        response = RedirectResponse(url="/login", status_code=302)
+        response.delete_cookie("access_token")
+        return response
     record = db.query(ReputationRecord).filter(
         ReputationRecord.id == record_id,
         ReputationRecord.employer_id == current_user.id
@@ -464,6 +478,10 @@ def delete_record(
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
+    if current_user.is_blocked:
+        response = RedirectResponse(url="/login", status_code=302)
+        response.delete_cookie("access_token")
+        return response
     record = db.query(ReputationRecord).filter(
         ReputationRecord.id == record_id,
         ReputationRecord.employer_id == current_user.id
@@ -475,9 +493,6 @@ def delete_record(
     db.commit()
     return RedirectResponse(url="/employees", status_code=302)
 
-@app.get("/landing", response_class=HTMLResponse)
-def landing(request: Request):
-    return templates.TemplateResponse("landing.html", {"request": request})
 
 @app.exception_handler(404)
 async def not_found(request: Request, exc: HTTPException):
@@ -487,7 +502,6 @@ async def not_found(request: Request, exc: HTTPException):
         {"request": request},
         status_code=404
     )
-
 
 from app.routes import autocomplete
 app.include_router(autocomplete.router)
