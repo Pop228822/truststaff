@@ -1,0 +1,23 @@
+<!-- enter_2fa.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Ввод 2FA-кода</title>
+</head>
+<body>
+    <h1>Двухфакторная аутентификация</h1>
+    <p>Мы отправили 6-значный код на указанный email.</p>
+
+    {% if error %}
+    <div style="color:red;">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/2fa">
+        <input type="hidden" name="email" value="{{ email }}"/>
+        <label for="twofa_code">Введите 2FA-код:</label>
+        <input type="text" id="twofa_code" name="twofa_code" maxlength="6" required/>
+        <button type="submit">Продолжить</button>
+    </form>
+</body>
+</html>

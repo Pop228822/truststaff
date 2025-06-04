@@ -1,10 +1,11 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from random import randint
 
 from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 from typing import Optional
 
-from fastapi import FastAPI, Request, Depends, HTTPException, Form, UploadFile, File
+from fastapi import FastAPI, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pdfkit
@@ -64,7 +65,8 @@ def register_form(request: Request):
 
 
 import secrets
-from app.email_utils import send_verification_email
+from app.email_utils import send_verification_email, send_2fa_code
+
 
 @app.post("/register", response_class=HTMLResponse)
 def register_user(
@@ -204,10 +206,70 @@ def login_user(
         })
 
     log_login_attempt(session, email, ip, True)
+
+    code = str(randint(100000, 999999))
+    user.twofa_code = code
+    user.twofa_expires_at = datetime.utcnow() + timedelta(minutes=5)
+    session.commit()
+    send_2fa_code(user.email, code)
+
+    return templates.TemplateResponse("enter_2fa.html", {
+        "request": request,
+        "email": user.email
+    })
+
+@app.get("/2fa")
+def get_2fa_form(request: Request):
+    return templates.TemplateResponse("enter_2fa.html", {"request": request})
+
+@app.post("/2fa")
+def verify_2fa(
+    request: Request,
+    twofa_code: str = Form(...),
+    email: str = Form(...),
+    session: Session = Depends(get_session)
+):
+    user = session.query(User).filter(User.email == email).first()
+    if not user:
+        return templates.TemplateResponse("enter_2fa.html", {
+            "request": request,
+            "error": "Пользователь не найден",
+            "email": email
+        })
+
+    # Проверяем код и срок
+    if user.twofa_code != twofa_code:
+        return templates.TemplateResponse("enter_2fa.html", {
+            "request": request,
+            "error": "Неверный код",
+            "email": email
+        })
+
+    if user.twofa_expires_at < datetime.utcnow():
+        return templates.TemplateResponse("enter_2fa.html", {
+            "request": request,
+            "error": "Код просрочен, запросите заново",
+            "email": email
+        })
+
+    # Если всё верно — "финализируем" вход: создаём access_token и ставим куку
     token = create_access_token({"sub": str(user.id)})
     response = RedirectResponse("/", status_code=302)
-    response.set_cookie(key="access_token", value=token, httponly=True, secure=True, samesite="lax")
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="lax"
+    )
+
+    # После входа можно сбросить 2fa_code, чтобы не использовать повторно
+    user.twofa_code = None
+    user.twofa_expires_at = None
+    session.commit()
+
     return response
+
 
 import requests
 

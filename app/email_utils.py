@@ -44,7 +44,6 @@ def send_verification_email(to_addr: str, token: str) -> bool:
         return True
 
     except Exception as exc:
-        # Логируем причину — удобно видеть в Render-логах
         print("❌ Ошибка отправки письма:", repr(exc))
         return False
 
@@ -78,4 +77,32 @@ def send_password_reset_email(to_addr: str, token: str) -> bool:
 
     except Exception as exc:
         print("❌ Ошибка отправки письма:", repr(exc))
+        return False
+
+
+def send_2fa_code(to_addr: str, code: str) -> bool:
+    """Отправляет на почту пользователю 6-значный код."""
+    body_html = f"""
+    <html><body>
+    Здравствуйте!<br><br>
+    Ваш код для входа в TrustStaff: <b>{code}</b><br>
+    Действует 5 минут.<br><br>
+    Если вы не запрашивали код, просто проигнорируйте это письмо.
+    </body></html>
+    """
+
+    msg = MIMEText(body_html, "html", "utf-8")
+    msg["Subject"] = "Код для входа в TrustStaff"
+    msg["From"] = formataddr((SENDER_NAME, SMTP_USER))
+    msg["To"] = to_addr
+
+    try:
+        ctx = ssl.create_default_context()
+        with smtplib.SMTP_SSL(SMTP_HOST, SMTP_PORT, context=ctx) as server:
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_USER, [to_addr], msg.as_string())
+        print("2FA код отправлен на email:", to_addr)
+        return True
+    except Exception as exc:
+        print("Ошибка отправки 2FA-кода:", repr(exc))
         return False
