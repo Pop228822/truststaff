@@ -1,44 +1,38 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="record-form">
+<div class="record-form" id="twofa-wrapper" data-remain-seconds="{{ remain_seconds|default('0') }}">
     <h2 class="text-center">Двухфакторная аутентификация</h2>
 
     <p>Мы отправили 6-значный код на указанный email: <strong>{{ email }}</strong></p>
 
     {% if error %}
-        <p class="text-center text-red">
-            <em>{{ error }}</em>
-        </p>
+        <p class="text-center text-red"><em>{{ error }}</em></p>
     {% endif %}
-
-    <form method="post" action="/2fa">
-        <!-- Нужно, чтобы сервер знал, какой email проверять -->
-        <input type="hidden" name="email" value="{{ email }}"/>
-
-        <div class="form-group">
-            <label for="twofa_code">Введите 2FA-код</label>
-            <input
-                type="text"
-                id="twofa_code"
-                name="twofa_code"
-                maxlength="6"
-                required
-            />
-        </div>
-
-        <div class="text-center">
-            <button type="submit" class="big-button">Продолжить</button>
-        </div>
-
-    </form>
-        <form method="post" action="/2fa/resend" style="margin-top: 1rem;">
-        <input type="hidden" name="email" value="{{ email }}"/>
-        <button type="submit">Отправить код ещё раз</button>
-    </form>
-
     {% if info %}
         <p style="color: green;">{{ info }}</p>
     {% endif %}
-</div>
 
+    <form method="post" action="/2fa">
+        <input type="hidden" name="email" value="{{ email }}"/>
+        <div class="form-group">
+            <label for="twofa_code">Введите 2FA-код</label>
+            <input type="text" id="twofa_code" name="twofa_code" maxlength="6" required/>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="big-button">Продолжить</button>
+        </div>
+    </form>
+
+    <form method="post" action="/2fa/resend" style="margin-top: 1rem;">
+        <input type="hidden" name="email" value="{{ email }}"/>
+        <div class="text-center">
+            <button id="resend-button" type="submit" class="big-button">Отправить код ещё раз</button>
+        </div>
+    </form>
+
+    <div class="text-center">
+        <span id="resend-countdown" style="color: red;"></span>
+    </div>
+</div>
+<script src="/static/js/twofa.js"></script>
 {% endblock %}

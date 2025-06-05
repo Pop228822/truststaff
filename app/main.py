@@ -290,7 +290,8 @@ def resend_2fa_code(
             return templates.TemplateResponse("enter_2fa.html", {
                 "request": request,
                 "error": f"Подождите ещё {remaining} сек. перед повторной отправкой.",
-                "email": user.email
+                "email": user.email,
+                "remain_seconds": remaining
             })
 
     code = str(randint(100000, 999999))
@@ -302,7 +303,8 @@ def resend_2fa_code(
     return templates.TemplateResponse("enter_2fa.html", {
         "request": request,
         "email": user.email,
-        "info": "Новый код отправлен"
+        "info": "Новый код отправлен",
+        "remain_seconds": 60
     })
 
 import requests
