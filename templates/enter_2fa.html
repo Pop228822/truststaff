@@ -1,23 +1,35 @@
-<!-- enter_2fa.html -->
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8"/>
-    <title>Ввод 2FA-кода</title>
-</head>
-<body>
-    <h1>Двухфакторная аутентификация</h1>
-    <p>Мы отправили 6-значный код на указанный email.</p>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="record-form">
+
+    <h2 class="text-center">Двухфакторная аутентификация</h2>
+
+    <p>Мы отправили 6-значный код на указанный email: <strong>{{ email }}</strong></p>
 
     {% if error %}
-    <div style="color:red;">{{ error }}</div>
+        <p class="text-center text-red">
+            <em>{{ error }}</em>
+        </p>
     {% endif %}
 
-    <form method="post" action="/2fa">
-        <input type="hidden" name="email" value="{{ email }}"/>
-        <label for="twofa_code">Введите 2FA-код:</label>
-        <input type="text" id="twofa_code" name="twofa_code" maxlength="6" required/>
-        <button type="submit">Продолжить</button>
+    <form method="post">
+        <!-- id="twofa_code" нужен, чтобы label for="twofa_code" работал корректно -->
+        <div class="form-group">
+            <label for="twofa_code">Введите код</label>
+            <input
+                type="text"
+                name="twofa_code"
+                id="twofa_code"
+                maxlength="6"
+                required
+            >
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="big-button">Продолжить</button>
+        </div>
     </form>
-</body>
-</html>
+
+</div>
+{% endblock %}
