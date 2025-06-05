@@ -14,7 +14,8 @@
     {% endif %}
 
     <form method="post">
-        <!-- id="twofa_code" нужен, чтобы label for="twofa_code" работал корректно -->
+        <input type="hidden" name="email" value="{{ email }}">
+
         <div class="form-group">
             <label for="twofa_code">Введите код</label>
             <input
