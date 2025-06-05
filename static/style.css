@@ -493,7 +493,6 @@ button.reject {
     color: red;
 }
 
-/* Дополнительный цвет #b03b3b */
 .text-darkred {
     color: #b03b3b;
 }
@@ -573,3 +572,15 @@ button.reject {
 }
 
 
+.resend-form {
+  margin-top: 1rem;
+}
+
+.countdown-container {
+  margin-top: 3px;
+}
+
+
+.countdown-text {
+  color: red;
+}

@@ -9,7 +9,7 @@
         <p class="text-center text-red"><em>{{ error }}</em></p>
     {% endif %}
     {% if info %}
-        <p style="color: green;">{{ info }}</p>
+        <p class="text-green">{{ info }}</p>
     {% endif %}
 
     <form method="post" action="/2fa">
@@ -23,16 +23,19 @@
         </div>
     </form>
 
-    <form method="post" action="/2fa/resend" style="margin-top: 1rem;">
+    <form method="post" action="/2fa/resend" class="resend-form">
         <input type="hidden" name="email" value="{{ email }}"/>
         <div class="text-center">
             <button id="resend-button" type="submit" class="big-button">Отправить код ещё раз</button>
         </div>
     </form>
 
-    <div class="text-center">
-        <span id="resend-countdown" style="color: red;"></span>
+    <!-- Блок, где показываем отсчёт -->
+    <div class="text-center countdown-container">
+        <span id="resend-countdown" class="countdown-text"></span>
     </div>
 </div>
+
+<!-- Подключаем внешний скрипт (без inline). -->
 <script src="/static/js/twofa.js"></script>
 {% endblock %}
