@@ -29,6 +29,16 @@
         <div class="text-center">
             <button type="submit" class="big-button">Продолжить</button>
         </div>
+
     </form>
+        <form method="post" action="/2fa/resend" style="margin-top: 1rem;">
+        <input type="hidden" name="email" value="{{ email }}"/>
+        <button type="submit">Отправить код ещё раз</button>
+    </form>
+
+    {% if info %}
+        <p style="color: green;">{{ info }}</p>
+    {% endif %}
 </div>
+
 {% endblock %}

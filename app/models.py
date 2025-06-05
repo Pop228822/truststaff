@@ -23,6 +23,8 @@ class User(SQLModel, table=True):
     is_blocked: bool = Field(default=False)
     twofa_code: Optional[str] = Field(default=None, max_length=6)
     twofa_expires_at: Optional[datetime] = Field(default=None)
+    twofa_sent_at: Optional[datetime] = Field(default=None)
+
 
 class Employee(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)

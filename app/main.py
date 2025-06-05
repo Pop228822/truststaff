@@ -270,6 +270,40 @@ def verify_2fa(
 
     return response
 
+@app.post("/2fa/resend")
+def resend_2fa_code(
+    request: Request,
+    email: str = Form(...),
+    session: Session = Depends(get_session)
+):
+    user = session.query(User).filter(User.email == email).first()
+    if not user:
+        return templates.TemplateResponse("enter_2fa.html", {
+            "request": request,
+            "error": "Пользователь не найден",
+            "email": email
+        })
+    if user.twofa_sent_at:
+        elapsed_seconds = (datetime.utcnow() - user.twofa_sent_at).total_seconds()
+        if elapsed_seconds < 60:
+            remaining = 60 - int(elapsed_seconds)
+            return templates.TemplateResponse("enter_2fa.html", {
+                "request": request,
+                "error": f"Подождите ещё {remaining} сек. перед повторной отправкой.",
+                "email": user.email
+            })
+
+    code = str(randint(100000, 999999))
+    user.twofa_code = code
+    user.twofa_expires_at = datetime.utcnow() + timedelta(minutes=5)
+    user.twofa_sent_at = datetime.utcnow()
+    session.commit()
+    send_2fa_code(user.email, code)
+    return templates.TemplateResponse("enter_2fa.html", {
+        "request": request,
+        "email": user.email,
+        "info": "Новый код отправлен"
+    })
 
 import requests
 
