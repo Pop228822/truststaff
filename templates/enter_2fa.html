@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="record-form">
 
@@ -14,6 +13,7 @@
     {% endif %}
 
     <form method="post">
+        <!-- Передаём email, чтобы бэкенд знал, кому проверять код -->
         <input type="hidden" name="email" value="{{ email }}">
 
         <div class="form-group">
@@ -31,6 +31,5 @@
             <button type="submit" class="big-button">Продолжить</button>
         </div>
     </form>
-
 </div>
 {% endblock %}
