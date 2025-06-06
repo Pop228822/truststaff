@@ -7,6 +7,7 @@ from jose import JWTError, jwt
 from sqlalchemy.orm import Session
 from typing import Optional
 from fastapi.security import HTTPBearer
+from starlette.responses import RedirectResponse
 
 from app.database import get_session
 from app.models import User
@@ -41,29 +42,48 @@ class OptionalBearer(HTTPBearer):
 
 oauth2_scheme_optional = OptionalBearer()
 
+# ----------------- helpers.py -----------------
+def _extract_token(request: Request, header_token: Optional[str]) -> Optional[str]:
+    """Берём JWT либо из Authorization, либо из cookie."""
+    if header_token:
+        return header_token
+    return request.cookies.get("access_token")
+
+
+def decode_token(token: str) -> Optional[int]:
+    """Декодирует JWT и возвращает user_id или None."""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return int(payload.get("sub")) if payload.get("sub") else None
+    except JWTError:
+        return None
+# ----------------------------------------------
+
 def get_current_user(
     request: Request,
     token: Optional[str] = Depends(oauth2_scheme_optional),
     db: Session = Depends(get_session)
-):
-    if not token:
-        token = request.cookies.get("access_token")
+) -> User:
+    token = _extract_token(request, token)
     if not token:
         raise HTTPException(status_code=401, detail="Нет токена")
 
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("sub")
-        if not user_id:
-            raise HTTPException(status_code=401, detail="Неверный токен")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Ошибка токена")
+    user_id = decode_token(token)
+    if not user_id:
+        # сбрасываем битый токен
+        response = RedirectResponse("/login", status_code=302)
+        response.delete_cookie("access_token")
+        raise HTTPException(status_code=401, detail="Неверный токен")
 
-    user = db.query(User).filter(User.id == int(user_id)).first()
+    user = db.query(User).filter(User.id == user_id).first()
     if not user:
+        response = RedirectResponse("/login", status_code=302)
+        response.delete_cookie("access_token")
         raise HTTPException(status_code=401, detail="Пользователь не найден")
+
     if user.is_blocked:
         raise HTTPException(status_code=403, detail="Аккаунт заблокирован.")
+
     return user
 
 def get_current_user_safe(
@@ -71,20 +91,16 @@ def get_current_user_safe(
     token: Optional[str] = Depends(oauth2_scheme_optional),
     db: Session = Depends(get_session)
 ) -> Optional[User]:
-    if not token:
-        token = request.cookies.get("access_token")
+    token = _extract_token(request, token)
     if not token:
         return None
 
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("sub")
-        if not user_id:
-            return None
-    except JWTError:
+    user_id = decode_token(token)
+    if not user_id:
         return None
 
-    return db.query(User).filter(User.id == int(user_id)).first()
+    return db.query(User).filter(User.id == user_id).first()
+
 
 def get_session_user(
     request: Request,
@@ -109,11 +125,22 @@ def get_session_user(
 def only_approved_user(
     request: Request,
     db: Session = Depends(get_session),
-    current_user: User = Depends(get_current_user)
-):
-    if not current_user or current_user.verification_status != "approved":
-        raise HTTPException(status_code=307, headers={"Location": "/onboarding"})
+    current_user: Optional[User] = Depends(get_current_user_safe)
+) -> User:
+    if not current_user:
+        # пользователь исчез или токен некорректен → на логин
+        response = RedirectResponse("/login", status_code=302)
+        response.delete_cookie("access_token")
+        raise HTTPException(status_code=302, headers={"Location": "/login"})
+
+    if current_user.verification_status != "approved":
+        raise HTTPException(status_code=302, headers={"Location": "/onboarding"})
+
+    if current_user.is_blocked:
+        raise HTTPException(status_code=302, headers={"Location": "/login"})
+
     return current_user
+
 
 def optional_user(
     request: Request,
