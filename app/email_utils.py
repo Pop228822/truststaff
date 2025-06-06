@@ -15,15 +15,47 @@ SMTP_PASSWORD = os.getenv("SMTP_PASSWORD")
 
 # ----------------------------------------------------------
 def send_verification_email(to_addr: str, token: str) -> bool:
-    link = f"https://truststaff.onrender.com/verify?token={token}"
+    link = f"https://app.truststaff.ru/verify?token={token}"
     body_html = f"""
-    <html><body>
-    Здравствуйте!<br><br>
-    Чтобы подтвердить почту, перейдите по ссылке:<br>
-    <a href="{link}">{link}</a><br><br>
-    Если вы не регистрировались, просто проигнорируйте это письмо.
-    </body></html>
-    """
+    <html>
+    <head>
+      <meta charset="UTF-8"/>
+    </head>
+    <body style="margin:0; padding:0; font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <p>Здравствуйте!</p>
+        <p>Чтобы подтвердить вашу почту, нажмите на кнопку ниже или откройте ссылку в браузере:</p>
+
+        <div style="margin: 20px 0;">
+          <a href="{link}"
+             style="
+                display: inline-block;
+                text-decoration: none;
+                background: #0052cc;
+                color: #fff;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: bold;
+             "
+          >
+            Подтвердить почту
+          </a>
+        </div>
+
+        <p style="word-wrap:break-word;">
+          <a href="{link}" style="color:#0052cc;">{link}</a>
+        </p>
+
+        <p>Если вы не регистрировались в TrustStaff, просто проигнорируйте письмо.</p>
+        <br>
+        <p style="font-size:12px; color:#999;">
+          С уважением,<br>
+          Команда TrustStaff
+        </p>
+      </div>
+    </body>
+    </html>
+        """
 
     # Формируем MIME-письмо
     msg = MIMEText(body_html, "html", "utf-8")
@@ -50,15 +82,47 @@ def send_verification_email(to_addr: str, token: str) -> bool:
 
 def send_password_reset_email(to_addr: str, token: str) -> bool:
     """Отправляет письмо для восстановления пароля."""
-    link = f"https://truststaff.onrender.com/reset-password?token={token}"
+    link = f"https://app.truststaff.ru/reset-password?token={token}"
     body_html = f"""
-    <html><body>
-    Здравствуйте!<br><br>
-    Поступил запрос на восстановление пароля в TrustStaff.<br>
-    Чтобы сбросить пароль, перейдите по ссылке:<br>
-    <a href="{link}">{link}</a><br><br>
-    Если вы не делали этот запрос, просто проигнорируйте письмо.
-    </body></html>
+    <html>
+    <head>
+      <meta charset="UTF-8"/>
+    </head>
+    <body style="margin:0; padding:0; font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <p>Здравствуйте!</p>
+        <p>Поступил запрос на восстановление пароля в TrustStaff.</p>
+        <p>Чтобы сбросить пароль, нажмите на кнопку ниже или откройте ссылку в браузере:</p>
+
+        <div style="margin: 20px 0;">
+          <a href="{link}"
+             style="
+                display: inline-block;
+                text-decoration: none;
+                background: #0052cc;
+                color: #fff;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-weight: bold;
+             "
+          >
+            Сбросить пароль
+          </a>
+        </div>
+
+        <p style="word-wrap:break-word;">
+          <a href="{link}" style="color:#0052cc;">{link}</a>
+        </p>
+
+        <p>Если вы не делали этот запрос, просто проигнорируйте письмо.</p>
+        <br>
+        <p style="font-size:12px; color:#999;">
+          С уважением,<br>
+          Команда TrustStaff
+        </p>
+      </div>
+    </body>
+    </html>
     """
 
     msg = MIMEText(body_html, "html", "utf-8")
