@@ -34,15 +34,18 @@
     </ul>
 
     {% if has_more %}
-        <!-- Кнопка "Загрузить ещё", двигаем skip на skip+limit -->
-        <form method="get" action="/admin/users/list">
-            <input type="hidden" name="skip" value="{{ skip + limit }}">
-            <input type="hidden" name="limit" value="{{ limit }}">
-            <button type="submit" class="big-button">Загрузить ещё</button>
-        </form>
-
+        <!-- Вместо формы -->
+        <button
+            id="load-more-btn"
+            class="big-button"
+            data-skip="{{ skip }}"
+            data-limit="{{ limit }}"
+        >
+            Загрузить ещё
+        </button>
     {% else %}
         <p>Все пользователи загружены.</p>
     {% endif %}
 </div>
+<script src="/static/js/load_users.js"></script>
 {% endblock %}

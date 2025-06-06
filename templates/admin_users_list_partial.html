@@ -1,0 +1,20 @@
+{% for u in users %}
+<li class="user-list-item">
+    <strong>ID:</strong> {{ u.id }} |
+    <strong>Email:</strong> {{ u.email }} |
+    <strong>Верификация:</strong> {{ u.verification_status }}<br>
+
+    <a href="/admin/user/{{ u.id }}" class="link-blue">Подробнее</a>
+
+    {# Если нужно, повторяем ту же логику блокировки/разблокировки #}
+    {% if u.is_blocked %}
+        <form method="post" action="/superadmin/unblock/{{ u.id }}" style="display:inline;">
+            <button type="submit" class="big-button">Разблокировать</button>
+        </form>
+    {% else %}
+        <form method="post" action="/superadmin/block/{{ u.id }}" style="display:inline;">
+            <button type="submit" class="big-button danger">Заблокировать</button>
+        </form>
+    {% endif %}
+</li>
+{% endfor %}

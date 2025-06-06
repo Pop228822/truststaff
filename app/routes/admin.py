@@ -100,18 +100,11 @@ def admin_users_list(
     db: Session = Depends(get_session),
     current_user: User = Depends(ensure_admin),
     skip: int = Query(0, ge=0),
-    limit: int = Query(10, gt=0, le=100)  # Макс 100
+    limit: int = Query(10, ge=1, le=100),
+    partial: bool = Query(False)
 ):
-    """
-    Страница для отображения пользователей постранично по 10 (load more).
-    Сортировка: сначала верифицированные, затем по дате регистрации (убывание).
-    """
-    # Подсчитываем общее количество
     total_count = db.query(User).count()
 
-    # Получаем нужный срез, используя CASE для приоритета по verified
-    # Если verification_status='approved', то CASE вернёт 1, иначе 0
-    # И сортируем по этому полю убыванием, затем по created_at убыванием
     users = (
         db.query(User)
         .order_by(
@@ -123,21 +116,28 @@ def admin_users_list(
         .all()
     )
 
-    print("Users found:", users)  # посмотреть ID, emails...
-    print("skip =", skip, "limit =", limit)
-
-    # Проверяем, есть ли ещё пользователи для "Загрузить ещё"
     has_more = (skip + limit) < total_count
 
-    return templates.TemplateResponse("admin_users_list.html", {
-        "request": request,
-        "users": users,
-        "skip": skip,
-        "limit": limit,
-        "has_more": has_more,
-        "total_count": total_count,
-        "current_user": current_user
-    })
+    if partial:
+        # Возвращаем кусок <li>...</li>
+        return templates.TemplateResponse(
+            "admin_users_list_partial.html",
+            {
+                "request": request,
+                "users": users
+            }
+        )
+    else:
+        # Возвращаем полный шаблон
+        return templates.TemplateResponse("admin_users_list.html", {
+            "request": request,
+            "users": users,
+            "skip": skip,
+            "limit": limit,
+            "has_more": has_more,
+            "total_count": total_count,
+            "current_user": current_user
+        })
 
 
 # --- 2. Страница подробностей о пользователе ---
