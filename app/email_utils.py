@@ -83,12 +83,30 @@ def send_password_reset_email(to_addr: str, token: str) -> bool:
 def send_2fa_code(to_addr: str, code: str) -> bool:
     """Отправляет на почту пользователю 6-значный код."""
     body_html = f"""
-    <html><body>
-    Здравствуйте!<br><br>
-    Ваш код для входа в TrustStaff: <b>{code}</b><br>
-    Действует 5 минут.<br><br>
-    Если вы не запрашивали код, просто проигнорируйте это письмо.
-    </body></html>
+    <html>
+    <head>
+      <meta charset="UTF-8">
+    </head>
+    <body style="font-family: Arial, sans-serif; font-size: 14px; color: #333; margin: 0; padding: 0;">
+      <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <p>Здравствуйте!</p>
+        <p>Ваш код для входа в TrustStaff:</p>
+        <div style="
+             margin: 20px 0; 
+             border: 2px solid #ccc; 
+             border-radius: 8px; 
+             text-align: center; 
+             font-size: 28px; 
+             font-weight: bold; 
+             padding: 15px 0;
+        ">
+          {code}
+        </div>
+        <p>Действует 5 минут.<br>
+        Если вы не запрашивали код, просто проигнорируйте это письмо.</p>
+      </div>
+    </body>
+    </html>
     """
 
     msg = MIMEText(body_html, "html", "utf-8")
