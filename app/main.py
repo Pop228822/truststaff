@@ -625,6 +625,9 @@ app.include_router(api_2fa.router)
 from app.routes import api_employees
 app.include_router(api_employees.router)
 
+from app.routes import api_check
+app.include_router(api_check.router)
+
 from app.jobs.cleanup_PU import cleanup_pending_users
 from apscheduler.schedulers.background import BackgroundScheduler
 
