@@ -29,7 +29,7 @@ class User(SQLModel, table=True):
 class Employee(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     full_name: str
-    birth_date: Optional[date] = None
+    birth_date: date
     contact: Optional[str] = None
     created_by_user_id: int = Field(foreign_key="user.id")
     records: List["ReputationRecord"] = Relationship(back_populates="employee")

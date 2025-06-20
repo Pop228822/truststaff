@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from datetime import date, datetime
 from sqlalchemy import func
@@ -10,6 +11,9 @@ from app.routes.api_auth import get_api_user
 
 router = APIRouter(prefix="/api/employees")
 
+class CheckEmployeeRequest(BaseModel):
+    full_name: str
+    birth_date: Optional[date] = None
 
 @router.post("/check")
 def api_check_employee(
