@@ -67,17 +67,8 @@ def api_check_employee(
     db.commit()
 
     query = db.query(Employee).filter(Employee.full_name.ilike(f"%{data.full_name.strip()}%"))
-
-    if data.birth_date:
-        try:
-            parsed_date = data.birth_date
-            query = query.filter(Employee.birth_date == parsed_date)
-            print(f"📅 Фильтрация по дате: {parsed_date}")
-        except ValueError:
-            raise HTTPException(status_code=400, detail="invalid_birth_date_format")
-
     employees = query.all()
-    print(f"🔍 Найдено сотрудников: {len(employees)}")
+    print(f"🔍 Найдено без даты: {len(employees)}")
 
     response = []
 
