@@ -28,6 +28,7 @@ class ReputationRecordOut(BaseModel):
     commendation: Optional[str] = None
 
 class EmployeeCheckResponse(BaseModel):
+    employee_id: int
     full_name: str
     birth_date: str
     record_count: int
@@ -97,6 +98,7 @@ def api_check_employee(
                 ))
 
         response.append(EmployeeCheckResponse(
+            employee_id=emp.id,
             full_name=emp.full_name,
             birth_date=str(emp.birth_date),
             record_count=len(output_records),
