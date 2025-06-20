@@ -50,6 +50,8 @@ def api_check_employee(
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
+    print(f"👤 Поиск сотрудника: {data.full_name}, дата рождения: {data.birth_date}")
+
     today = date.today()
     start_of_day = datetime(today.year, today.month, today.day)
 
@@ -64,14 +66,23 @@ def api_check_employee(
     db.add(CheckLog(user_id=current_user.id))
     db.commit()
 
-    query = db.query(Employee).filter(Employee.full_name.ilike(data.full_name.strip()))
+    query = db.query(Employee).filter(Employee.full_name.ilike(f"%{data.full_name.strip()}%"))
+
     if data.birth_date:
-        query = query.filter(Employee.birth_date == data.birth_date)
+        try:
+            parsed_date = data.birth_date
+            query = query.filter(Employee.birth_date == parsed_date)
+            print(f"📅 Фильтрация по дате: {parsed_date}")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="invalid_birth_date_format")
 
     employees = query.all()
+    print(f"🔍 Найдено сотрудников: {len(employees)}")
+
     response = []
 
     for emp in employees:
+        print(f"➡ Сотрудник: {emp.full_name} ({emp.birth_date})")
         records = db.query(ReputationRecord).filter(ReputationRecord.employee_id == emp.id).all()
         output_records = []
 
