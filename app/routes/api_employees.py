@@ -6,7 +6,7 @@ from datetime import datetime
 
 from app.database import get_session
 from app.routes.api_auth import get_api_user
-from app.models import User, Employee
+from app.models import User, Employee, ReputationRecord
 
 router = APIRouter(prefix="/api/employees")
 
@@ -51,3 +51,33 @@ def api_add_employee(
     db.commit()
 
     return {"status": "success", "employee_id": employee.id}
+
+@router.get("/", response_model=list[dict])
+def list_employees_api(
+    db: Session = Depends(get_session),
+    current_user: User = Depends(get_api_user)
+):
+    employees = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).all()
+
+    results = []
+    for emp in employees:
+        records = db.query(ReputationRecord).filter(ReputationRecord.employee_id == emp.id).all()
+        results.append({
+            "id": emp.id,
+            "full_name": emp.full_name,
+            "birth_date": emp.birth_date.isoformat(),
+            "contact": emp.contact,
+            "record_count": len(records),
+            "records": [
+                {
+                    "position": r.position,
+                    "hired_at": r.hired_at.isoformat() if r.hired_at else None,
+                    "fired_at": r.fired_at.isoformat() if r.fired_at else None,
+                    "misconduct": r.misconduct,
+                    "commendation": r.commendation,
+                }
+                for r in records
+            ]
+        })
+
+    return results
