@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/employees")
 
 class CheckEmployeeRequest(BaseModel):
     full_name: str
-    birth_date: Optional[str] = None  # формат: YYYY-MM-DD
+    birth_date: Optional[date] = None
 
 class ReputationRecordOut(BaseModel):
     is_blocked_employer: bool
