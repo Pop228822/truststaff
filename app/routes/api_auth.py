@@ -5,6 +5,7 @@ from app.auth import verify_password, get_session, create_access_token
 from datetime import datetime, timedelta
 from random import randint
 
+from app.email_utils import send_2fa_code
 from app.models import User
 
 router = APIRouter(prefix="/api/auth")
@@ -25,8 +26,12 @@ def api_login(data: LoginRequest, db: Session = Depends(get_session)):
     if not user.is_email_verified:
         raise HTTPException(status_code=403, detail="email_not_verified")
 
-    if user.twofa_code:
-        raise HTTPException(status_code=403, detail="2fa_required")
+    # 🟡 Если 2FA ещё не был запрошен или истёк — генерируем и отправляем
+    if not user.twofa_code or not user.twofa_expires_at or user.twofa_expires_at < datetime.utcnow():
+        code = str(randint(100000, 999999))
+        user.twofa_code = code
+        user.twofa_expires_at = datetime.utcnow() + timedelta(minutes=5)
+        db.commit()
+        send_2fa_code(user.email, code)
 
-    token = create_access_token({"sub": str(user.id)})
-    return {"access_token": token}
+    raise HTTPException(status_code=403, detail="2fa_required")
