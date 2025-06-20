@@ -2,6 +2,7 @@
 
 from fastapi import APIRouter, Depends, Form, HTTPException
 from sqlmodel import Session
+from datetime import datetime
 
 from app.database import get_session
 from app.routes.api_auth import get_api_user
@@ -35,10 +36,14 @@ def api_add_employee(
         raise HTTPException(status_code=400, detail="employee_limit_reached")
 
     full_name = f"{last_name} {first_name} {middle_name}".strip()
+    try:
+        parsed_birth_date = datetime.strptime(birth_date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(status_code=400, detail="invalid_birth_date_format")
 
     employee = Employee(
         full_name=full_name,
-        birth_date=birth_date,
+        birth_date=parsed_birth_date,
         contact=contact,
         created_by_user_id=current_user.id
     )
