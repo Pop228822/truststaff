@@ -60,7 +60,7 @@ def api_check_employee(
         CheckLog.created_at >= start_of_day
     ).scalar()
 
-    if count_today >= 20:
+    if count_today >= 1000:
         raise HTTPException(status_code=429, detail="Превышен лимит бесплатных проверок (20 в день)")
 
     db.add(CheckLog(user_id=current_user.id))
