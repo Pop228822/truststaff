@@ -1,7 +1,11 @@
+import os
+
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt, JWTError
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from app.auth import verify_password, get_session, create_access_token
+from app.auth import verify_password, get_session
 from datetime import datetime, timedelta
 from random import randint
 
@@ -35,3 +39,22 @@ def api_login(data: LoginRequest, db: Session = Depends(get_session)):
         send_2fa_code(user.email, code)
 
     raise HTTPException(status_code=403, detail="2fa_required")
+
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
+def get_api_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_session)) -> User:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload.get("sub"))
+    except (JWTError, ValueError):
+        raise HTTPException(status_code=401, detail="invalid_token")
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or user.is_blocked:
+        raise HTTPException(status_code=401, detail="user_not_found_or_blocked")
+
+    return user
