@@ -29,5 +29,5 @@ def verify_2fa_api(data: TwoFactorRequest, db: Session = Depends(get_session)):
     user.twofa_expires_at = None
     db.commit()
 
-    token = create_access_token(user.id)
+    token = create_access_token({"sub": str(user.id)})
     return {"access_token": token}

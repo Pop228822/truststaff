@@ -28,5 +28,5 @@ def api_login(data: LoginRequest, db: Session = Depends(get_session)):
     if user.twofa_code:
         raise HTTPException(status_code=403, detail="2fa_required")
 
-    token = create_access_token(user.id)
+    token = create_access_token({"sub": str(user.id)})
     return {"access_token": token}
