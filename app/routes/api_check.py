@@ -1,3 +1,4 @@
+from ecdsa.test_keys import data
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -18,10 +19,13 @@ class CheckEmployeeRequest(BaseModel):
 @router.post("/check")
 def api_check_employee(
     full_name: str,
-    birth_date: Optional[date] = None,
+    birth_date: CheckEmployeeRequest,
     db: Session = Depends(get_session),
     current_user: User = Depends(get_api_user)
 ):
+    full_name = data.full_name
+    birth_date = data.birth_date
+
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
