@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from datetime import date, datetime
 from sqlalchemy import func
-from typing import Optional, List
+from typing import Optional
 
 from app.models import Employee, ReputationRecord, User, CheckLog
 from app.auth import get_session
@@ -11,48 +10,18 @@ from app.routes.api_auth import get_api_user
 
 router = APIRouter(prefix="/api/employees")
 
-class CheckEmployeeRequest(BaseModel):
-    full_name: str
-    birth_date: Optional[date] = None
 
-class ReputationRecordOut(BaseModel):
-    is_blocked_employer: bool
-    blocked_message: Optional[str] = None
-
-    employer_id: Optional[int] = None
-    position: Optional[str] = None
-    hired_at: Optional[str] = None
-    fired_at: Optional[str] = None
-    misconduct: Optional[str] = None
-    dismissal_reason: Optional[str] = None
-    commendation: Optional[str] = None
-
-class EmployeeCheckResponse(BaseModel):
-    employee_id: int
-    full_name: str
-    birth_date: str
-    record_count: int
-    records: List[ReputationRecordOut]
-
-@router.get("/me")
-def my_profile(current_user: User = Depends(get_api_user)):
-    return {
-        "id": current_user.id,
-        "email": current_user.email,
-        "company": current_user.company_name,
-    }
-
-@router.post("/check", response_model=List[EmployeeCheckResponse])
+@router.post("/check")
 def api_check_employee(
-    data: CheckEmployeeRequest,
+    full_name: str,
+    birth_date: Optional[date] = None,
     db: Session = Depends(get_session),
     current_user: User = Depends(get_api_user)
 ):
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    print(f"👤 Поиск сотрудника: {data.full_name}, дата рождения: {data.birth_date}")
-
+    # Лимит проверок
     today = date.today()
     start_of_day = datetime(today.year, today.month, today.day)
 
@@ -62,47 +31,49 @@ def api_check_employee(
     ).scalar()
 
     if count_today >= 1000:
-        raise HTTPException(status_code=429, detail="Превышен лимит бесплатных проверок (20 в день)")
+        raise HTTPException(status_code=429, detail="Превышен лимит проверок")
 
     db.add(CheckLog(user_id=current_user.id))
     db.commit()
 
-    query = db.query(Employee).filter(Employee.full_name.ilike(f"%{data.full_name.strip()}%"))
+    # Поиск
+    query = db.query(Employee).filter(Employee.full_name.ilike(f"%{full_name.strip()}%"))
+    if birth_date:
+        query = query.filter(Employee.birth_date == birth_date)
+
     employees = query.all()
-    print(f"🔍 Найдено без даты: {len(employees)}")
 
-    response = []
-
+    result = []
     for emp in employees:
-        print(f"➡ Сотрудник: {emp.full_name} ({emp.birth_date})")
+        emp_data = {
+            "employee_id": emp.id,
+            "full_name": emp.full_name,
+            "birth_date": emp.birth_date.isoformat(),
+            "record_count": 0,
+            "records": []
+        }
+
         records = db.query(ReputationRecord).filter(ReputationRecord.employee_id == emp.id).all()
-        output_records = []
-
         for record in records:
-            employer = db.query(User).get(record.employer_id)
+            employer = db.get(User, record.employer_id)
             if employer and employer.is_blocked:
-                output_records.append(ReputationRecordOut(
-                    is_blocked_employer=True,
-                    blocked_message="Предприниматель заблокирован, отзыв неактуален."
-                ))
+                emp_data["records"].append({
+                    "is_blocked_employer": True,
+                    "blocked_message": "Предприниматель заблокирован, отзыв неактуален."
+                })
             else:
-                output_records.append(ReputationRecordOut(
-                    is_blocked_employer=False,
-                    employer_id=record.employer_id,
-                    position=record.position,
-                    hired_at=str(record.hired_at) if record.hired_at else None,
-                    fired_at=str(record.fired_at) if record.fired_at else None,
-                    misconduct=record.misconduct,
-                    dismissal_reason=record.dismissal_reason,
-                    commendation=record.commendation,
-                ))
+                emp_data["records"].append({
+                    "is_blocked_employer": False,
+                    "employer_id": record.employer_id,
+                    "position": record.position,
+                    "hired_at": record.hired_at.isoformat(),
+                    "fired_at": record.fired_at.isoformat() if record.fired_at else None,
+                    "misconduct": record.misconduct,
+                    "dismissal_reason": record.dismissal_reason,
+                    "commendation": record.commendation,
+                })
 
-        response.append(EmployeeCheckResponse(
-            employee_id=emp.id,
-            full_name=emp.full_name,
-            birth_date=str(emp.birth_date),
-            record_count=len(output_records),
-            records=output_records
-        ))
+        emp_data["record_count"] = len(emp_data["records"])
+        result.append(emp_data)
 
-    return response
+    return result
