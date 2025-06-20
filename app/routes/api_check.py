@@ -6,7 +6,8 @@ from sqlalchemy import func
 from typing import Optional, List
 
 from app.models import Employee, ReputationRecord, User, CheckLog
-from app.auth import get_session, get_session_user
+from app.auth import get_session
+from app.routes.api_auth import get_api_user
 
 router = APIRouter(prefix="/api/employees")
 
@@ -32,11 +33,19 @@ class EmployeeCheckResponse(BaseModel):
     record_count: int
     records: List[ReputationRecordOut]
 
+@router.get("/me")
+def my_profile(current_user: User = Depends(get_api_user)):
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "company": current_user.company_name,
+    }
+
 @router.post("/check", response_model=List[EmployeeCheckResponse])
 def api_check_employee(
     data: CheckEmployeeRequest,
     db: Session = Depends(get_session),
-    current_user: User = Depends(get_session_user)
+    current_user: User = Depends(get_api_user)
 ):
     if not current_user:
         raise HTTPException(status_code=401, detail="Unauthorized")
