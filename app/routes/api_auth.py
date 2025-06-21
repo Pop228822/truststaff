@@ -58,3 +58,14 @@ def get_api_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
         raise HTTPException(status_code=401, detail="user_not_found_or_blocked")
 
     return user
+
+def only_approved_api_user(
+    current_user: User = Depends(get_api_user)
+) -> User:
+    if current_user.verification_status != "approved":
+        raise HTTPException(status_code=403, detail="account_not_verified")
+
+    if current_user.is_blocked:
+        raise HTTPException(status_code=403, detail="account_blocked")
+
+    return current_user

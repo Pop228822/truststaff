@@ -12,6 +12,8 @@ import pdfkit
 from sqlalchemy.orm import Session
 import os
 from app.limit import rate_limit_100_per_minute
+from app.routes.api_auth import only_approved_api_user
+
 load_dotenv()
 from app.auth import (
     hash_password,
@@ -473,7 +475,7 @@ def add_record_api(
     dismissal_reason: Optional[str] = Form(None),
     commendation: Optional[str] = Form(None),
     db: Session = Depends(get_session),
-    current_user: User = Depends(only_approved_user)
+    current_user: User = Depends(only_approved_api_user)
 ):
     if current_user.is_blocked:
         return JSONResponse(status_code=403, content={"error": "Пользователь заблокирован"})
