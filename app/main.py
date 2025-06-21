@@ -12,7 +12,7 @@ import pdfkit
 from sqlalchemy.orm import Session
 import os
 from app.limit import rate_limit_100_per_minute
-from app.routes.api_auth import only_approved_api_user
+from app.routes.api_auth import only_approved_api_user, get_api_user
 
 load_dotenv()
 from app.auth import (
@@ -474,7 +474,7 @@ def add_record_api(
     misconduct: Optional[str] = Form(None),
     dismissal_reason: Optional[str] = Form(None),
     commendation: Optional[str] = Form(None),
-    db: Session = Depends(get_session),
+    db: Session = Depends(get_api_user),
     current_user: User = Depends(only_approved_api_user)
 ):
     if current_user.is_blocked:
