@@ -1,11 +1,12 @@
 import os
+from typing import Optional
 
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from app.auth import verify_password, get_session
+from app.auth import verify_password, get_session, oauth2_scheme_optional
 from datetime import datetime, timedelta
 from random import randint
 
@@ -59,13 +60,32 @@ def get_api_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
 
     return user
 
+def get_api_user_safe(
+    token: Optional[str] = Depends(oauth2_scheme_optional),
+    db: Session = Depends(get_session)
+) -> Optional[User]:
+    if not token:
+        return None
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = int(payload.get("sub"))
+    except (JWTError, ValueError):
+        return None
+
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user or user.is_blocked:
+        return None
+
+    return user
+
 def only_approved_api_user(
-    current_user: User = Depends(get_api_user)
+    current_user: Optional[User] = Depends(get_api_user_safe)
 ) -> User:
+    if not current_user:
+        raise HTTPException(status_code=401, detail="unauthorized")
+
     if current_user.verification_status != "approved":
         raise HTTPException(status_code=403, detail="account_not_verified")
-
-    if current_user.is_blocked:
-        raise HTTPException(status_code=403, detail="account_blocked")
 
     return current_user
