@@ -38,6 +38,10 @@ from app.auth import optional_user
 from app.routes import superadmin
 app.include_router(superadmin.router)
 
+from fastapi.security import HTTPBearer
+
+oauth2_scheme = HTTPBearer()
+
 MAX_EMPLOYERS_COUNT = 30
 
 @app.get("/policy", response_class=HTMLResponse)
