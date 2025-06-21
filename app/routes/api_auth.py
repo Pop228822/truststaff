@@ -48,6 +48,14 @@ ALGORITHM = os.getenv("ALGORITHM")
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
+def decode_api_token(token: HTTPAuthorizationCredentials) -> Optional[int]:
+    try:
+        raw_token = token.credentials  # изъятие строки из объекта
+        payload = jwt.decode(raw_token, SECRET_KEY, algorithms=[ALGORITHM])
+        return int(payload.get("sub"))
+    except (JWTError, ValueError, AttributeError):
+        return None
+
 def get_api_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_session)) -> User:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -68,11 +76,8 @@ def get_api_user_safe(
     if not token:
         return None
 
-    try:
-        raw_token = token.credentials  # 💥 ВАЖНО
-        payload = jwt.decode(raw_token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = int(payload.get("sub"))
-    except (JWTError, ValueError):
+    user_id = decode_api_token(token)
+    if not user_id:
         return None
 
     user = db.query(User).filter(User.id == user_id).first()
