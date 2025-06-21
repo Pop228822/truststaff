@@ -475,7 +475,7 @@ def add_record_api(
     dismissal_reason: Optional[str] = Form(None),
     commendation: Optional[str] = Form(None),
     db: Session = Depends(get_session),
-    current_user: User = Depends(only_approved_api_user)
+    current_user: User = Depends(get_api_user)
 ):
     if current_user.is_blocked:
         return JSONResponse(status_code=403, content={"error": "Пользователь заблокирован"})
