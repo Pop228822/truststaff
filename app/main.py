@@ -474,7 +474,7 @@ def add_record_api(
     misconduct: Optional[str] = Form(None),
     dismissal_reason: Optional[str] = Form(None),
     commendation: Optional[str] = Form(None),
-    db: Session = Depends(get_api_user),
+    db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_api_user)
 ):
     if current_user.is_blocked:
