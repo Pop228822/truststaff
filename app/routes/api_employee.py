@@ -1,12 +1,13 @@
 from fastapi import APIRouter, Form, Depends
 from fastapi.responses import JSONResponse
 from typing import Optional
-from sqlmodel import Session as SQLSession
+from sqlmodel import Session as SQLSession, Session
 
 from app.models import User, ReputationRecord
 from app.routes.api_auth import get_api_user, get_session
 
 router = APIRouter(prefix="/api")
+
 
 @router.post("/employee/{employee_id}/add-record")
 def add_record_api(
@@ -17,7 +18,7 @@ def add_record_api(
     misconduct: Optional[str] = Form(None),
     dismissal_reason: Optional[str] = Form(None),
     commendation: Optional[str] = Form(None),
-    db: SQLSession = Depends(get_session),
+    db: Session = Depends(get_session),
     current_user: User = Depends(get_api_user)
 ):
     if current_user.is_blocked:
