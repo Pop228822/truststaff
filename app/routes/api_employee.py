@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Form, Depends
 from fastapi.responses import JSONResponse
 from typing import Optional
-from sqlmodel import Session as SQLSession, Session
+from sqlmodel import Session
 
 from app.models import User, ReputationRecord
 from app.routes.api_auth import get_api_user, get_session

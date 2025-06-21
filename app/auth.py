@@ -50,12 +50,15 @@ def _extract_token(request: Request, header_token: Optional[str]) -> Optional[st
     return request.cookies.get("access_token")
 
 
-def decode_token(token: str) -> Optional[int]:
-    """Декодирует JWT и возвращает user_id или None."""
+from fastapi.security import HTTPAuthorizationCredentials
+
+def decode_token(token: str | HTTPAuthorizationCredentials) -> Optional[int]:
     try:
+        if isinstance(token, HTTPAuthorizationCredentials):
+            token = token.credentials
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return int(payload.get("sub")) if payload.get("sub") else None
-    except JWTError:
+    except (JWTError, ValueError, AttributeError):
         return None
 # ----------------------------------------------
 
