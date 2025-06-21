@@ -77,8 +77,7 @@ def list_employees_api(
                     "commendation": r.commendation,
                 }
                 for r in records
-            ],
-            "add_record_link": f"truststaff://add-record?employee_id={emp.id}"
+            ]
         })
 
     return results
