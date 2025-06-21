@@ -48,8 +48,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 def get_api_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_session)) -> User:
     try:
-        raw_token = token.credentials
-        payload = jwt.decode(raw_token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = int(payload.get("sub"))
     except (JWTError, ValueError):
         raise HTTPException(status_code=401, detail="invalid_token")
