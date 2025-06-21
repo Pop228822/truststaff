@@ -81,3 +81,10 @@ def list_employees_api(
         })
 
     return results
+
+@router.get("/{employee_id}/link-add-record")
+def mobile_add_record_link(employee_id: int, current_user: User = Depends(get_api_user)):
+    # Проверка прав можно убрать или оставить, если нужно
+    return {
+        "url": f"truststaff://add-record?employee_id={employee_id}"
+    }
