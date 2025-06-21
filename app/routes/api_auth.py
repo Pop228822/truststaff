@@ -1,6 +1,7 @@
 import os
 from typing import Optional
 
+from fastapi.security.http import HTTPAuthorizationCredentials
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -61,14 +62,15 @@ def get_api_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
     return user
 
 def get_api_user_safe(
-    token: Optional[str] = Depends(oauth2_scheme_optional),
+    token: Optional[HTTPAuthorizationCredentials] = Depends(oauth2_scheme_optional),
     db: Session = Depends(get_session)
 ) -> Optional[User]:
     if not token:
         return None
 
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        raw_token = token.credentials  # 💥 ВАЖНО
+        payload = jwt.decode(raw_token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = int(payload.get("sub"))
     except (JWTError, ValueError):
         return None
