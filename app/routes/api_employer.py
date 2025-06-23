@@ -3,7 +3,6 @@ from fastapi.responses import JSONResponse
 from sqlmodel import Session
 import os
 import shutil
-from uuid import uuid4
 
 from app.models import User
 from app.routes.api_auth import get_api_user, get_session
