@@ -7,7 +7,7 @@ from typing import Optional
 
 from app.models import Employee, ReputationRecord, User, CheckLog
 from app.auth import get_session
-from app.routes.api_auth import get_api_user
+from app.routes.api_auth import get_api_user, only_approved_api_user
 
 router = APIRouter(prefix="/api/employees")
 
@@ -19,7 +19,7 @@ class CheckEmployeeRequest(BaseModel):
 def api_check_employee(
     data: CheckEmployeeRequest,
     db: Session = Depends(get_session),
-    current_user: User = Depends(get_api_user)
+    current_user: User = Depends(only_approved_api_user)
 ):
     full_name = data.full_name
     birth_date = data.birth_date

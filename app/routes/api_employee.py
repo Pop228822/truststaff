@@ -3,8 +3,9 @@ from fastapi.responses import JSONResponse
 from typing import Optional
 from sqlmodel import Session
 
+from app.auth import only_approved_user
 from app.models import User, ReputationRecord
-from app.routes.api_auth import get_api_user, get_session
+from app.routes.api_auth import get_api_user, get_session, only_approved_api_user
 
 router = APIRouter(prefix="/api")
 
@@ -19,7 +20,7 @@ def add_record_api(
     dismissal_reason: Optional[str] = Form(None),
     commendation: Optional[str] = Form(None),
     db: Session = Depends(get_session),
-    current_user: User = Depends(get_api_user)
+    current_user: User = Depends(only_approved_api_user)
 ):
     if current_user.is_blocked:
         return JSONResponse(status_code=403, content={"error": "Пользователь заблокирован"})
