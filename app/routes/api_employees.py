@@ -5,7 +5,7 @@ from sqlmodel import Session
 from datetime import datetime
 
 from app.database import get_session
-from app.routes.api_auth import get_api_user
+from app.routes.api_auth import get_api_user, only_approved_api_user
 from app.models import User, Employee, ReputationRecord
 
 router = APIRouter(prefix="/api/employees")
@@ -28,7 +28,7 @@ def api_add_employee(
     birth_date: str = Form(...),
     contact: str = Form(""),
     db: Session = Depends(get_session),
-    current_user: User = Depends(get_api_user)
+    current_user: User = Depends(only_approved_api_user)
 ):
     # Проверка лимита
     employee_count = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).count()
@@ -83,7 +83,7 @@ def list_employees_api(
     return results
 
 @router.get("/{employee_id}/link-add-record")
-def mobile_add_record_link(employee_id: int, current_user: User = Depends(get_api_user)):
+def mobile_add_record_link(employee_id: int, current_user: User = Depends(only_approved_api_user)):
     # Проверка прав можно убрать или оставить, если нужно
     return {
         "url": f"truststaff://add-record?employee_id={employee_id}"
