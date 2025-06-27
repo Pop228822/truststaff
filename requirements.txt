@@ -15,4 +15,5 @@ APScheduler>=3.10,<4.0
 SQLAlchemy~=2.0.40
 starlette~=0.46.2
 pydantic~=2.11.4
+email-validator
 httpx
