@@ -603,6 +603,9 @@ async def not_found(request: Request, exc: HTTPException):
         status_code=404
     )
 
+from app.routes import api_register
+app.include_router(api_register.router)
+
 from app.routes import autocomplete
 app.include_router(autocomplete.router)
 
