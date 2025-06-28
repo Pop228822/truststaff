@@ -639,6 +639,9 @@ app.include_router(api_employee.router)
 from app.routes import api_employer
 app.include_router(api_employer.router)
 
+from app.routes import api_info_of_me
+app.include_router(api_info_of_me.router)
+
 from app.routes import api_password_recovery
 app.include_router(api_password_recovery.api_router)
 
