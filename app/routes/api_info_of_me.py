@@ -13,7 +13,7 @@ def get_current_user_info(
     db: Session = Depends(get_session),
     current_user: User = Depends(get_current_user)
 ):
-    employee_count = db.query(Employee).filter(Employee.user_id == current_user.id).count()
+    employee_count = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).count()
 
     return JSONResponse({
         "id": current_user.id,
