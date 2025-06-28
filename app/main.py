@@ -639,6 +639,9 @@ app.include_router(api_employee.router)
 from app.routes import api_employer
 app.include_router(api_employer.router)
 
+from app.routes import api_password_recovery
+app.include_router(api_password_recovery.api_router)
+
 from app.jobs.cleanup_PU import cleanup_pending_users
 from apscheduler.schedulers.background import BackgroundScheduler
 
