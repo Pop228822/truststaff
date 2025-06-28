@@ -10,14 +10,6 @@ from app.models import User, Employee, ReputationRecord
 
 router = APIRouter(prefix="/api/employees")
 
-@router.get("/me")
-def my_profile(current_user: User = Depends(get_api_user)):
-    return {
-        "id": current_user.id,
-        "email": current_user.email,
-        "company": current_user.company_name,
-    }
-
 MAX_EMPLOYERS_COUNT = 30
 
 @router.post("/add")
