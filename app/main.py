@@ -11,6 +11,8 @@ from fastapi.templating import Jinja2Templates
 import pdfkit
 from sqlalchemy.orm import Session
 import os
+
+from app.auth_redirect import AuthRedirectMiddleware
 from app.limit import rate_limit_100_per_minute
 from app.routes.api_auth import only_approved_api_user, get_api_user
 
@@ -32,6 +34,7 @@ app = FastAPI(
     dependencies=[Depends(rate_limit_100_per_minute)]
 )
 
+app.add_middleware(AuthRedirectMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 templates = Jinja2Templates(directory="templates")
 from app.auth import optional_user
