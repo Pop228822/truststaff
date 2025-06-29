@@ -24,13 +24,13 @@ class LoginRequest(BaseModel):
 def api_login(data: LoginRequest, db: Session = Depends(get_session)):
     user = db.query(User).filter(User.email == data.email).first()
     if not user or not verify_password(data.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="invalid_credentials")
+        raise HTTPException(status_code=401, detail="Неверный логин или пароль")
 
     if user.is_blocked:
-        raise HTTPException(status_code=403, detail="blocked")
+        raise HTTPException(status_code=403, detail="Аккаунт заблокирован")
 
     if not user.is_email_verified:
-        raise HTTPException(status_code=403, detail="email_not_verified")
+        raise HTTPException(status_code=403, detail="Почта не верефицирована")
 
     # 🟡 Если 2FA ещё не был запрошен или истёк — генерируем и отправляем
     if not user.twofa_code or not user.twofa_expires_at or user.twofa_expires_at < datetime.utcnow():

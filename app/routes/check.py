@@ -6,7 +6,7 @@ from datetime import date, datetime
 
 from app.database import get_session
 from app.models import User, Employee, ReputationRecord, CheckLog
-from app.auth import get_session_user
+from app.auth import get_session_user, only_approved_user
 from fastapi.templating import Jinja2Templates
 
 templates = Jinja2Templates(directory="templates")
@@ -16,7 +16,7 @@ router = APIRouter()
 @router.get("/check", response_class=HTMLResponse)
 def check_form(
     request: Request,
-    current_user: Optional[User] = Depends(get_session_user)
+    current_user: Optional[User] = Depends(only_approved_user)
 ):
     if current_user.is_blocked:
         response = RedirectResponse("/login", status_code=302)

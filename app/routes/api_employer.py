@@ -36,13 +36,13 @@ async def submit_verification_api(
         return JSONResponse(status_code=400, content={"error": f"Недопустимый формат .{ext}"})
 
     # Проверка размера
-    MAX_MB = 5
+    MAX_MB = 10
     MAX_SIZE = MAX_MB * 1024 * 1024
     passport_file.file.seek(0, 2)
     size = passport_file.file.tell()
     passport_file.file.seek(0)
     if size > MAX_SIZE:
-        return JSONResponse(status_code=400, content={"error": "Файл больше 5 МБ"})
+        return JSONResponse(status_code=400, content={"error": "Файл больше 10 МБ"})
 
     # Сохраняем
     filename = generate_safe_filename(passport_file.filename, current_user.id)

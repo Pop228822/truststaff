@@ -23,13 +23,15 @@ def api_add_employee(
     # Проверка лимита
     employee_count = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).count()
     if employee_count >= MAX_EMPLOYERS_COUNT:
-        raise HTTPException(status_code=400, detail="employee_limit_reached")
+        raise HTTPException(status_code=400,
+                            detail="Сотрудников не должно быть больше 30"
+                                   "(рассматриваем исключения, пишите в поддержку)")
 
     full_name = f"{last_name} {first_name} {middle_name}".strip()
     try:
         parsed_birth_date = datetime.strptime(birth_date, "%Y-%m-%d").date()
     except ValueError:
-        raise HTTPException(status_code=400, detail="invalid_birth_date_format")
+        raise HTTPException(status_code=400, detail="Некорректная дата")
 
     employee = Employee(
         full_name=full_name,
