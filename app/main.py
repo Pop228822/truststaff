@@ -624,6 +624,9 @@ app.include_router(password_recovery.router)
 from app.routes import admin
 app.include_router(admin.router)
 
+from app.routes import api_feedback
+app.include_router(api_feedback.router)
+
 from app.routes import api_auth
 app.include_router(api_auth.router)
 
