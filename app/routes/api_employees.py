@@ -100,6 +100,9 @@ def api_generate_consent_pdf(
     if not employee:
         raise HTTPException(status_code=404, detail="Сотрудник не найден")
 
+    if employee.created_by_user_id != current_user.id:
+        raise HTTPException(status_code=403, detail="Нет доступа к сотруднику")
+
     env = Environment(loader=FileSystemLoader("templates"))
     template = env.get_template("consent_template.html")
 
