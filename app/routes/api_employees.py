@@ -1,5 +1,3 @@
-# app/routes/api_employees.py
-
 from fastapi import APIRouter, Depends, Form, HTTPException
 from sqlmodel import Session
 from datetime import datetime
@@ -80,3 +78,44 @@ def mobile_add_record_link(employee_id: int, current_user: User = Depends(only_a
     return {
         "url": f"truststaff://add-record?employee_id={employee_id}"
     }
+
+from fastapi.responses import StreamingResponse
+from fastapi import UploadFile, File, Form, Request, HTTPException, Depends
+from sqlmodel import Session
+from datetime import datetime
+from jinja2 import Environment, FileSystemLoader
+import pdfkit, io
+
+from app.models import User, Employee
+
+@router.post("/{employee_id}/generate-consent")
+def api_generate_consent_pdf(
+    employee_id: int,
+    employer_company_name: str = Form(...),
+    employer_inn: str = Form(...),
+    db: Session = Depends(get_session),
+    current_user: User = Depends(only_approved_api_user)
+):
+    employee = db.query(Employee).filter(Employee.id == employee_id).first()
+    if not employee:
+        raise HTTPException(status_code=404, detail="Сотрудник не найден")
+
+    env = Environment(loader=FileSystemLoader("templates"))
+    template = env.get_template("consent_template.html")
+
+    html = template.render(
+        full_name=employee.full_name,
+        birth_date=employee.birth_date,
+        contact=employee.contact or "",
+        employer_company_name=employer_company_name,
+        employer_inn=employer_inn,
+        today=datetime.now().strftime("%d.%m.%Y")
+    )
+
+    pdf_bytes = pdfkit.from_string(html, False)
+    return StreamingResponse(
+        io.BytesIO(pdf_bytes),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=consent_{employee.id}.pdf"}
+    )
+
