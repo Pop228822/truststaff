@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form, Depends
+from fastapi import APIRouter, Form, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from typing import Optional
 from sqlmodel import Session
@@ -48,3 +48,20 @@ def add_record_api(
     db.commit()
 
     return JSONResponse(status_code=201, content={"message": "Запись успешно добавлена"})
+
+@router.delete("/records/{record_id}")
+def api_delete_record(
+    record_id: int,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(only_approved_api_user)
+):
+    record = db.query(ReputationRecord).filter(
+        ReputationRecord.id == record_id,
+        ReputationRecord.employer_id == current_user.id
+    ).first()
+    if not record:
+        raise HTTPException(status_code=404, detail="Запись не найдена")
+
+    db.delete(record)
+    db.commit()
+    return {"success": True}
