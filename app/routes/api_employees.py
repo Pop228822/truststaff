@@ -62,6 +62,7 @@ def list_employees_api(
             "record_count": len(records),
             "records": [
                 {
+                    "id": r.id,
                     "position": r.position,
                     "hired_at": r.hired_at.isoformat() if r.hired_at else None,
                     "fired_at": r.fired_at.isoformat() if r.fired_at else None,
