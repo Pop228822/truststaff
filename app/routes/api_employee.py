@@ -49,7 +49,7 @@ def add_record_api(
 
     return JSONResponse(status_code=201, content={"message": "Запись успешно добавлена"})
 
-@router.delete("/records/{record_id}")
+@router.delete("/records/{record_id}/delete")
 def api_delete_record(
     record_id: int,
     db: Session = Depends(get_session),
@@ -64,4 +64,4 @@ def api_delete_record(
 
     db.delete(record)
     db.commit()
-    return {"success": True}
+    return {"detail": "Запись удалена"}
