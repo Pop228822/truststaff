@@ -26,7 +26,9 @@
     <form method="post" action="/2fa/resend" class="resend-form">
         <input type="hidden" name="email" value="{{ email }}"/>
         <div class="text-center">
-            <button id="resend-button" type="submit" class="big-button">Отправить код ещё раз</button>
+            <button id="resend-button" type="submit" class="big-button" data-no-disable>
+                Отправить код ещё раз
+            </button>
         </div>
     </form>
 
