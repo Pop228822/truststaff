@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel
-from database import engine  # или app.database, если внутри пакета
+from app.database import engine # или app.database, если внутри пакета
 
 # Явный импорт всех моделей
 from models import User, Employee, ReputationRecord, LoginAttempt, PendingUser, CheckLog, RateLimit
