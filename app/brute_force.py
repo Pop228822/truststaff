@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from sqlmodel import Session, select
 from app.models import LoginAttempt
 
-MAX_ATTEMPTS = 5
+MAX_ATTEMPTS = 10
 BLOCK_WINDOW_MINUTES = 60
 
 def log_login_attempt(db: Session, email: str, ip_address: str, success: bool):
