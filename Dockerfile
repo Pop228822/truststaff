@@ -25,4 +25,4 @@ COPY . .
 EXPOSE 8000
 
 # Команда запуска (можно заменить на gunicorn, если надо)
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "info", "--access-log"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers", "--log-level", "debug"]
