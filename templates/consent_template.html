@@ -1,77 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <style>
-        body {
-            font-family: sans-serif;
-            line-height: 1.6;
-            max-width: 750px;
-            margin: auto;
-            font-size: 14px;
-        }
-        h1 {
-            text-align: center;
-            font-size: 20px;
-            margin-bottom: 1em;
-            text-transform: uppercase;
-        }
-        ul {
-            margin-top: 0.5em;
-            padding-left: 20px;
-        }
-        p {
-            margin-bottom: 1em;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Согласие на обработку персональных данных</title>
+<style>
+@page { size: A4; margin: 2cm }
+body { font-family: "Times New Roman", serif; font-size: 12pt; line-height: 1.5; color: #000; }
+h1, h2, h3 { margin: 0 }
+.section { margin-top: 14pt }
+p { margin: 0 0 10pt 0 }
+ul { margin: 0 0 10pt 20pt }
+.small { font-size: 11pt }
+.bold { font-weight: 700 }
+.center { text-align: center }
+.right { text-align: right }
+.mb-0 { margin-bottom: 0 }
+.mb-10 { margin-bottom: 10pt }
+.mb-20 { margin-bottom: 20pt }
+.blank { display: inline-block; border-bottom: 1px solid #000; min-width: 200px; height: 1.2em; vertical-align: bottom }
+.blank.short { min-width: 80px }
+.blank.medium { min-width: 140px }
+.blank.long { min-width: 320px }
+hr { border: none; border-top: 1px solid #000; margin: 12pt 0 }
+.header-line { margin-bottom: 12pt }
+</style>
 </head>
 <body>
-    <h1>СОГЛАСИЕ НА ОБРАБОТКУ ПЕРСОНАЛЬНЫХ ДАННЫХ</h1>
-
-    <p><strong>Приложение №___</strong> к трудовому договору № ___ от ___</p>
-
-    <p>
-        Я, ____________________________________________,<br>
-        паспорт: серия ______ № ______, выдан ____________________________________________,<br>
-        настоящим даю своё согласие <strong>{{ employer_company_name }}</strong> (ИНН: <strong>{{ employer_inn }}</strong>)
-        на обработку следующих персональных данных:
-    </p>
-
-    <ul>
-        <li>паспортные данные;</li>
-        <li>контактный номер телефона;</li>
-        <li>адрес электронной почты;</li>
-        <li>адреса публичных страниц в сети «Интернет»;</li>
-    </ul>
-
-    <p>Согласие даётся для:</p>
-    <ul>
-        <li>исполнения трудового договора / договора оказания услуг / подряда;</li>
-        <li>предоставления информации на платформе <a href="https://truststaff.ru" target="_blank">https://truststaff.ru</a>;</li>
-        <li>предоставления сведений в госорганы РФ по требованию закона.</li>
-    </ul>
-
-    <p>
-        Согласие предоставляется на любые действия с моими персональными данными в рамках закона, включая: сбор, систематизацию, хранение, передачу, обезличивание, блокирование и т.д.
-    </p>
-
-    <p>
-        <strong>{{ employer_company_name }}</strong> гарантирует обработку данных в соответствии с законодательством РФ.
-    </p>
-
-    <p>
-        Срок действия согласия: с момента заключения договора до истечения сроков, установленных законом.
-    </p>
-
-    <p>
-        Я подтверждаю, что согласие является осознанным, добровольным и выражено в моих интересах.
-    </p>
-
-    <p><strong>Дата:</strong> «____» ____________ 20__ г.</p>
-    <br><br>
-    <p>____________________ /подпись работника/</p>
-    <p>____________________ /подпись работодателя/</p>
-    <p>М.П. (если есть)</p>
-    <p style="font-size: small;">Сгенерировано через TrustStaff</p>
+<div class="right header-line small">Приложение № <span class="blank short"></span> к трудовому договору № <span class="blank short"></span> от <span class="blank short"></span> / договору оказания услуг / подряда № <span class="blank short"></span> от <span class="blank short"></span></div>
+<div class="center mb-20 bold">СОГЛАСИЕ НА ОБРАБОТКУ ПЕРСОНАЛЬНЫХ ДАННЫХ</div>
+<p>Я, <span class="blank long"></span>,</p>
+<p>паспорт серии <span class="blank short"></span> номер <span class="blank short"></span>, выдан <span class="blank long"></span></p>
+<p class="mb-20"><span class="blank long"></span></p>
+<p class="mb-10">настоящим даю свое согласие на обработку индивидуальным предпринимателем / обществом с ограниченной ответственностью <span class="blank long"></span> (ИНН <span class="blank short"></span>, ОГРНИП / ОГРН <span class="blank short"></span>) моих следующих персональных данных:</p>
+<ul class="mb-20">
+<li>паспортные данные;</li>
+<li>контактный номер телефона;</li>
+<li>адрес электронной почты;</li>
+<li>адреса принадлежащих мне публичных страниц в коммуникационно-информационной сети «Интернет».</li>
+</ul>
+<p class="mb-10">Я даю согласие на использование моих персональных данных в целях:</p>
+<ul class="mb-20">
+<li>надлежащего исполнения трудового договора / договора оказания услуг / подряда и т. д. (далее – Договор);</li>
+<li>предоставления информации на сайте <a href="https://app.truststaff.ru" class="url" target="_blank" rel="noreferrer">app.truststaff.ru</a>;</li>
+<li>предоставления информации в государственные органы Российской Федерации в порядке и случаях, предусмотренных действующим законодательством.</li>
+</ul>
+<p class="mb-10">Настоящее согласие предоставляется на осуществление любых действий в отношении моих персональных данных, которые необходимы или желаемы для достижения указанных выше целей, включая (без ограничения) сбор, систематизацию, накопление, хранение, уточнение (обновление, изменение), использование, распространение (в том числе передачу третьим лицам), обезличивание, блокирование, трансграничную передачу персональных данных, а также осуществление любых иных действий с моими персональными данными, предусмотренных действующим законодательством Российской Федерации.</p>
+<p class="mb-10">Индивидуальный предприниматель / общество с ограниченной ответственностью <span class="blank long"></span> (ИНН <span class="blank short"></span>, ОГРНИП / ОГРН <span class="blank short"></span>) гарантирует, что обработка моих личных данных осуществляется в соответствии с действующим законодательством РФ.</p>
+<p class="mb-20">Данное Согласие действует с момента заключения мною Договора и до истечения сроков, установленных действующим законодательством Российской Федерации.</p>
+<p class="mb-20">Я подтверждаю, что настоящее Согласие на обработку персональных данных является конкретным, предметным, информированным, сознательным и однозначным, и давая такое Согласие, я действую своей волей и в своих интересах.</p>
+<div class="section">
+<table style="width:100%; border-collapse:collapse">
+<tr>
+<td style="width:33%; vertical-align:bottom">Дата: <span class="blank medium"></span></td>
+<td style="width:33%; vertical-align:bottom">Подпись: <span class="blank medium"></span></td>
+<td style="width:34%; vertical-align:bottom">Ф. И. О.: <span class="blank medium"></span></td>
+</tr>
+</table>
+</div>
 </body>
 </html>
