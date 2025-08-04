@@ -638,10 +638,12 @@ app.include_router(api_password_recovery.api_router)
 
 from app.jobs.cleanup_PU import cleanup_pending_users
 from apscheduler.schedulers.background import BackgroundScheduler
-
 scheduler = BackgroundScheduler()
-scheduler.add_job(cleanup_pending_users, 'interval', hours=24)
-scheduler.start()
+
+@app.on_event("startup")
+def startup_event():
+    scheduler.add_job(cleanup_pending_users, 'interval', minutes=10)
+    scheduler.start()
 
 @app.on_event("shutdown")
 def shutdown_event():
