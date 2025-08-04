@@ -476,19 +476,11 @@ def consent_form(
     employee = db.query(Employee).filter(Employee.id == employee_id).first()
     if not employee:
         raise HTTPException(status_code=404, detail="Сотрудник не найден")
-
-    # При желании можно проверить, заполнены ли company_name / inn_or_ogrn,
-    # но обычно просто пробрасываем напрямую:
-    default_company_name = current_user.company_name or ""
-    default_inn = current_user.inn_or_ogrn or ""
-
     return templates.TemplateResponse("consent_form.html", {
         "request": request,
         "employee_id": employee_id,
         "employee": employee,
-        "user": current_user,
-        "default_company_name": default_company_name,
-        "default_inn": default_inn
+        "user": current_user
     })
 
 
