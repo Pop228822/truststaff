@@ -6,7 +6,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     curl \
-    && apt-get clean
+    wkhtmltopdf \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Устанавливаем рабочую директорию внутри контейнера
 WORKDIR /app
