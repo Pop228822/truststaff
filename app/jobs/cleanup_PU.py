@@ -1,9 +1,8 @@
 from datetime import datetime, timedelta
-from sqlalchemy.orm import Session
 from app.database import SessionLocal
-from app.database import get_session
 from app.models import PendingUser
 import logging
+
 
 def cleanup_pending_users():
     session = SessionLocal()
@@ -11,8 +10,14 @@ def cleanup_pending_users():
         cutoff = datetime.utcnow() - timedelta(minutes=30)
         deleted_count = session.query(PendingUser).filter(
             PendingUser.created_at < cutoff
-        ).delete()
+        ).delete(synchronize_session=False)
         session.commit()
-        logging.info(f"Удалено {deleted_count} незавершённых регистраций старше суток")
+        msg = f"Удалено {deleted_count} PendingUser старше 30 минут (до {cutoff.isoformat()}Z)"
+        logging.info(msg)
+        print(msg)
     finally:
         session.close()
+
+
+if __name__ == "__main__":
+    cleanup_pending_users()
