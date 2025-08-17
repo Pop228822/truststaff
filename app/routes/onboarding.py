@@ -96,7 +96,7 @@ def submit_onboarding(
                              f"Разрешено: {', '.join(ALLOWED_EXTENSIONS)}."
         })
 
-    MAX_MB = 5
+    MAX_MB = 20
     MAX_SIZE = MAX_MB * 1024 * 1024  # 5 MB в байтах
 
     # Определяем размер
