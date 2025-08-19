@@ -9,6 +9,7 @@ from fastapi import FastAPI, Request, Depends, HTTPException, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import pdfkit
+from pydantic.networks import MAX_EMAIL_LENGTH
 from sqlalchemy.orm import Session
 import os
 
@@ -76,6 +77,9 @@ from app.email_utils import send_verification_email, send_2fa_code
 BAD_WORDS = {"fuck", "shit", "bitch", "хуй", "сука", "блядь"}  # расширяй по необходимости
 MAX_NAME_LENGTH = 50
 MIN_NAME_LENGTH = 2
+MAX_EMAIL_LENGTH = 254
+
+from email_validator import validate_email, EmailNotValidError
 
 @app.post("/register", response_class=HTMLResponse)
 def register_user(
@@ -86,6 +90,7 @@ def register_user(
     session: Session = Depends(get_session)
 ):
     clean_name = name.strip()
+    clean_email = email.lower()
 
     if len(clean_name) < MIN_NAME_LENGTH or len(clean_name) > MAX_NAME_LENGTH:
         return templates.TemplateResponse("register.html", {
@@ -98,6 +103,14 @@ def register_user(
             "request": request,
             "error": "Имя содержит недопустимые слова"
         })
+
+    if len(clean_email) == 0 or len(clean_email) > MAX_EMAIL_LENGTH:
+        return templates.TemplateResponse("register.html", {"request": request, "error": "Некорректный email"})
+
+    try:
+        validate_email(clean_email, check_deliverability=False)
+    except EmailNotValidError:
+        return templates.TemplateResponse("register.html", {"request": request, "error": "Некорректный email"})
 
     existing_user = session.query(User).filter(User.email == email).first()
     if existing_user:
