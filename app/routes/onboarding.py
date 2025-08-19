@@ -97,7 +97,7 @@ def submit_onboarding(
         })
 
     MAX_MB = 20
-    MAX_SIZE = MAX_MB * 1024 * 1024  # 5 MB в байтах
+    MAX_SIZE = MAX_MB * 1024 * 1024
 
     # Определяем размер
     passport_file.file.seek(0, 2)  # Перемещаем указатель в конец файла

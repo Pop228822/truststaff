@@ -73,6 +73,10 @@ import secrets
 from app.email_utils import send_verification_email, send_2fa_code
 
 
+BAD_WORDS = {"fuck", "shit", "bitch", "хуй", "сука", "блядь"}  # расширяй по необходимости
+MAX_NAME_LENGTH = 50
+MIN_NAME_LENGTH = 2
+
 @app.post("/register", response_class=HTMLResponse)
 def register_user(
     request: Request,
@@ -81,8 +85,20 @@ def register_user(
     password: str = Form(...),
     session: Session = Depends(get_session)
 ):
-    # 1. Проверяем, нет ли пользователя c таким email (в User ИЛИ PendingUser)
-    #    Нужно, чтобы не было задвоений в PendingUser
+    clean_name = name.strip()
+
+    if len(clean_name) < MIN_NAME_LENGTH or len(clean_name) > MAX_NAME_LENGTH:
+        return templates.TemplateResponse("register.html", {
+            "request": request,
+            "error": f"Имя должно быть от {MIN_NAME_LENGTH} до {MAX_NAME_LENGTH} символов"
+        })
+
+    if any(bad_word in clean_name.lower() for bad_word in BAD_WORDS):
+        return templates.TemplateResponse("register.html", {
+            "request": request,
+            "error": "Имя содержит недопустимые слова"
+        })
+
     existing_user = session.query(User).filter(User.email == email).first()
     if existing_user:
         return templates.TemplateResponse("register.html", {
@@ -92,18 +108,15 @@ def register_user(
 
     existing_pending = session.query(PendingUser).filter(PendingUser.email == email).first()
     if existing_pending:
-        # Можно обновить токен и дату, или отклонить
         return templates.TemplateResponse("register.html", {
             "request": request,
             "error": "На этот email уже есть незавершённая регистрация. Проверьте почту."
         })
 
-    # 2. Генерируем токен
     token = secrets.token_urlsafe(32)
 
-    # 3. Создаём PendingUser, а НЕ User
     pending = PendingUser(
-        name=name,
+        name=clean_name,
         email=email,
         password_hash=hash_password(password),
         email_verification_token=token
@@ -111,7 +124,6 @@ def register_user(
     session.add(pending)
     session.commit()
 
-    # 4. Отправляем письмо
     send_verification_email(email, token)
 
     return templates.TemplateResponse("register_success.html", {
