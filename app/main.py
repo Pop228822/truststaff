@@ -72,9 +72,8 @@ def register_form(request: Request):
 
 import secrets
 from app.email_utils import send_verification_email, send_2fa_code
+from app.bad_words import BAD_WORDS
 
-
-BAD_WORDS = {"fuck", "shit", "bitch", "хуй", "сука", "блядь"}  # расширяй по необходимости
 MAX_NAME_LENGTH = 50
 MIN_NAME_LENGTH = 2
 MAX_EMAIL_LENGTH = 254
