@@ -490,11 +490,25 @@ def list_employees(
         "employees": employees
     })
 
-@app.get("/employee/{employee_id}/add-record", response_class=HTMLResponse)
-def record_form(request: Request, employee_id: int):
-    return templates.TemplateResponse("add_record.html", {"request": request, "employee_id": employee_id})
-
 MAX_TEXT_LENGTH = 500
+
+@app.get("/employee/{employee_id}/add-record", response_class=HTMLResponse)
+def record_form(
+    request: Request,
+    employee_id: int,
+    current_user: User = Depends(only_approved_user)
+):
+    return templates.TemplateResponse("add_record.html", {
+        "request": request,
+        "employee_id": employee_id,
+        "error": None,
+        "position": "",
+        "hired_at": "",
+        "fired_at": "",
+        "misconduct": "",
+        "dismissal_reason": "",
+        "commendation": ""
+    })
 
 @app.post("/employee/{employee_id}/add-record")
 def add_record(
@@ -514,6 +528,13 @@ def add_record(
         response.delete_cookie("access_token")
         return response
 
+    position = position.strip()
+    hired_at = hired_at.strip()
+    fired_at = (fired_at or "").strip()
+    misconduct = (misconduct or "").strip()
+    dismissal_reason = (dismissal_reason or "").strip()
+    commendation = (commendation or "").strip()
+
     for field_name, field_value in {
         "Должность": position,
         "Нарушение": misconduct,
@@ -524,24 +545,33 @@ def add_record(
             return templates.TemplateResponse("add_record.html", {
                 "request": request,
                 "employee_id": employee_id,
-                "error": f"{field_name} не может превышать {MAX_TEXT_LENGTH} символов"
+                "error": f"{field_name} не может превышать {MAX_TEXT_LENGTH} символов",
+                "position": position,
+                "hired_at": hired_at,
+                "fired_at": fired_at,
+                "misconduct": misconduct,
+                "dismissal_reason": dismissal_reason,
+                "commendation": commendation
             })
 
-    # Считаем, сколько записей ReputationRecord уже есть у текущего пользователя по этому сотруднику
     existing_records_count = db.query(ReputationRecord).filter(
         ReputationRecord.employee_id == employee_id,
         ReputationRecord.employer_id == current_user.id
     ).count()
 
-    # Если уже 2 записи, то не разрешаем добавлять ещё
     if existing_records_count >= 2:
         return templates.TemplateResponse("add_record.html", {
             "request": request,
             "employee_id": employee_id,
-            "error": "Вы уже добавили 2 записи об этом сотруднике. Дальше добавлять нельзя."
+            "error": "Вы уже добавили 2 записи об этом сотруднике. Дальше добавлять нельзя.",
+            "position": position,
+            "hired_at": hired_at,
+            "fired_at": fired_at,
+            "misconduct": misconduct,
+            "dismissal_reason": dismissal_reason,
+            "commendation": commendation
         })
 
-    # Если лимит не превышен, создаём новую запись
     record = ReputationRecord(
         employee_id=employee_id,
         employer_id=current_user.id,

@@ -1,29 +1,36 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Добавить запись о сотруднике</h2>
+
+{% if error %}
+<div class="error-text">
+  {{ error }}
+</div>
+{% endif %}
+
 <form method="post" class="record-form">
     <label>Должность:<br>
-        <input type="text" name="position" required>
+        <input type="text" name="position" required maxlength="500" value="{{ position|default('') }}">
     </label><br><br>
 
     <label>Дата приёма:<br>
-        <input type="date" name="hired_at" required>
+        <input type="date" name="hired_at" required value="{{ hired_at|default('') }}">
     </label><br><br>
 
     <label>Дата увольнения (если есть):<br>
-        <input type="date" name="fired_at">
+        <input type="date" name="fired_at" value="{{ fired_at|default('') }}">
     </label><br><br>
 
     <label>Положительная характеристика (рекомендация):<br>
-        <textarea name="commendation" placeholder="Например: ответственный, пунктуальный..."></textarea>
+        <textarea name="commendation" maxlength="500" placeholder="Например: ответственный, пунктуальный...">{{ commendation|default('') }}</textarea>
     </label><br><br>
 
     <label>Нарушения (если были):<br>
-        <textarea name="misconduct"></textarea>
+        <textarea name="misconduct" maxlength="500">{{ misconduct|default('') }}</textarea>
     </label><br><br>
 
     <label>Причина увольнения (если есть):<br>
-        <textarea name="dismissal_reason"></textarea>
+        <textarea name="dismissal_reason" maxlength="500">{{ dismissal_reason|default('') }}</textarea>
     </label><br><br>
 
     <button type="submit">Добавить запись</button>
