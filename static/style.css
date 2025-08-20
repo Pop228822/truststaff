@@ -585,8 +585,8 @@ button.reject {
   color: red;
 }
 
-.wrap-text{
-  overflow-wrap:anywhere;
-  word-break:break-word;
-  white-space:pre-wrap;
+.wrap-text {
+    white-space: pre-wrap; /* сохраняет переводы строк и переносит текст */
+    word-wrap: break-word; /* перенос длинных слов */
+    overflow-wrap: anywhere; /* переносит очень длинные последовательности */
 }
