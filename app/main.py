@@ -373,18 +373,22 @@ def add_employee_form(request: Request, current_user: User = Depends(get_session
         return RedirectResponse("/onboarding", status_code=302)
     return templates.TemplateResponse("add_employee.html", {"request": request})
 
+
+def contains_bad_words(text: str) -> bool:
+    return any(bad in text.lower() for bad in BAD_WORDS)
+
+
 @app.post("/add-employee")
 def add_employee(
     request: Request,
     last_name: str = Form(...),
     first_name: str = Form(...),
-    middle_name: str = Form(...),  # отчество можно сделать необязательным
+    middle_name: str = Form(""),
     birth_date: str = Form(...),
     contact: str = Form(""),
     db: Session = Depends(get_session),
     current_user: User = Depends(only_approved_user)
 ):
-    # Проверяем лимит
     employee_count = db.query(Employee).filter(Employee.created_by_user_id == current_user.id).count()
     if employee_count >= MAX_EMPLOYERS_COUNT:
         return templates.TemplateResponse("add_employee.html", {
@@ -392,10 +396,42 @@ def add_employee(
             "error": "Вы уже добавили 30 сотрудников. Свяжитесь с поддержкой для увеличения лимита."
         })
 
-    # Объединяем ФИО в одну строку
-    full_name = f"{last_name} {first_name} {middle_name}".strip()
+    # Проверка ФИО
+    for value in [last_name, first_name, middle_name]:
+        if len(value) > 50:
+            return templates.TemplateResponse("add_employee.html", {
+                "request": request,
+                "error": "Слишком длинное имя или фамилия"
+            })
+        if contains_bad_words(value):
+            return templates.TemplateResponse("add_employee.html", {
+                "request": request,
+                "error": "Имя содержит недопустимые слова"
+            })
 
-    # Создаем запись о сотруднике
+    # Проверка даты
+    try:
+        dt = datetime.strptime(birth_date, "%Y-%m-%d")
+        if dt > datetime.now():
+            return templates.TemplateResponse("add_employee.html", {
+                "request": request,
+                "error": "Дата рождения не может быть в будущем"
+            })
+    except ValueError:
+        return templates.TemplateResponse("add_employee.html", {
+            "request": request,
+            "error": "Некорректный формат даты. Используйте ГГГГ-ММ-ДД"
+        })
+
+    # Проверка контакта
+    if contact and (len(contact) > 100 or contains_bad_words(contact)):
+        return templates.TemplateResponse("add_employee.html", {
+            "request": request,
+            "error": "Контакт содержит недопустимые слова или слишком длинный"
+        })
+
+    full_name = " ".join([last_name.strip(), first_name.strip(), middle_name.strip()]).strip()
+
     employee = Employee(
         full_name=full_name,
         birth_date=birth_date,
@@ -406,7 +442,6 @@ def add_employee(
     db.commit()
 
     return RedirectResponse("/employees", status_code=302)
-
 
 from fastapi.responses import RedirectResponse
 
