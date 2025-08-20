@@ -1,19 +1,17 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    {% if request.headers.host == "truststaff.ru" %}
-        <meta http-equiv="refresh" content="0; url=https://www.truststaff.ru{{ request.url.path }}">
-    {% endif %}
-    <title>TrustStaff</title>
-    <link rel="stylesheet" href="/static/style.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <title>TrustStaff</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/static/logo.png" type="image/x-icon">
+  <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    {% include "header.html" %}
-
-    {% block content %}{% endblock %}
-
-    {% include "footer.html" %}
-    <script src="/static/js/form-submit-lock.js" defer></script>
+  {% include "header.html" %}
+  {% block content %}{% endblock %}
+  {% include "footer.html" %}
+  <script src="/static/js/burger.js" defer></script>
+  <script src="/static/js/form-submit-lock.js" defer></script>
 </body>
 </html>
