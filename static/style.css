@@ -585,14 +585,9 @@ button.reject {
   color: red;
 }
 
+.record-block p,
 .wrap-text {
-    white-space: pre-wrap; /* сохраняет переводы строк и переносит текст */
-    word-wrap: break-word; /* перенос длинных слов */
-    overflow-wrap: anywhere; /* переносит очень длинные последовательности */
-}
-
-.record-block p {
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: anywhere;
+    white-space: pre-wrap;    /* переносы строк и сохранение \n */
+    word-break: break-all;    /* ломает даже длинные слова без пробелов */
+    overflow-wrap: anywhere;  /* дополнительная гарантия переноса */
 }
