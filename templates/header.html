@@ -1,21 +1,24 @@
 <header class="site-header">
-    <div class="container">
-        <div class="logo-title">
-            <a href="/">
-                <img src="/static/logo.png" alt="TrustStaff Logo" class="logo">
-            </a>
-            <h1 class="title">TrustStaff</h1>
-        </div>
-        <nav class="navbar">
-            <a href="/">Домой</a>
-            <a href="/register">Регистрация</a>
-            <a href="/login">Вход</a>
-            <a href="/logout">Выход</a>
-            <a href="/employees">Сотрудники</a>
-            <a href="/add-employee">Добавить</a>
-            <a href="/check">Проверить работника</a>
-        </nav>
+  <div class="container">
+    <div class="logo-title">
+      <a href="/"><img src="/static/logo.png" alt="TrustStaff Logo" class="logo"></a>
+      <h1 class="title">TrustStaff</h1>
+      <button class="burger" aria-label="Menu" aria-expanded="false" aria-controls="main-nav">
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+        <span class="burger-bar"></span>
+      </button>
     </div>
+    <nav class="navbar" id="main-nav">
+      <a href="/">Домой</a>
+      <a href="/register">Регистрация</a>
+      <a href="/login">Вход</a>
+      <a href="/logout">Выход</a>
+      <a href="/employees">Сотрудники</a>
+      <a href="/add-employee">Добавить</a>
+      <a href="/check">Проверить работника</a>
+    </nav>
+  </div>
 </header>
 
 <hr>

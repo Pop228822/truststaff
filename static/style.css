@@ -291,79 +291,124 @@ button.reject {
     -webkit-overflow-scrolling: touch;
 }
 
-@media (max-width: 600px) {
-    body {
-        padding: 1rem;
-        max-width: 100%;
-    }
+@media (max-width: 720px) {
+  .logo-title {
+    justify-content: space-between;
+  }
 
-    h1 {
-        font-size: 1.4rem;
-    }
+  .burger {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    margin-left: auto;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
 
-    .site-header {
-        padding: 12px 0;
-    }
+  .burger-bar {
+    display: block;
+    width: 22px;
+    height: 2px;
+    background: #2c3e50;
+  }
 
-    .title {
-        font-size: 1.5rem;
-    }
+  .navbar {
+    display: block;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height .25s ease, opacity .2s ease;
+  }
 
-    .record-block {
-        padding: 1rem;
-        border-radius: 6px;
-        font-size: 0.95rem;
-    }
+  .navbar.open {
+    max-height: 600px;
+    opacity: 1;
+  }
 
-    .record-block p {
-        margin: 0.5rem 0;
-        display: flex;
-        flex-direction: column; /* чтобы иконка/заголовок и текст шли друг под другом */
-        gap: 0.25rem;
-        line-height: 1.4;
-    }
+  .navbar a {
+    display: block;
+    padding: .6rem 0;
+    margin: 0;
+    border-top: 1px solid #eee;
+  }
 
-    .record-block p strong {
-        font-weight: 600;
-    }
+  /* Теперь идут твои стили для max-width: 600px (имеют приоритет, т.к. ниже) */
+  body {
+    padding: 1rem;
+    max-width: 100%;
+  }
 
-    .record-block .wrap-text {
-        white-space: pre-wrap;
-        overflow-wrap: anywhere;
-        word-break: break-word;
-    }
+  h1 {
+    font-size: 1.4rem;
+  }
 
-    .form-actions {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-        margin-top: 1rem;
-    }
+  .site-header {
+    padding: 12px 0;
+  }
 
-    .btn-secondary,
-    .record-form button,
-    .big-button {
-        width: 100%;
-        text-align: center;
-    }
+  .title {
+    font-size: 1.5rem;
+  }
 
-    nav a,
-    .navbar a {
-        display: block;
-        margin: 0.25rem 0;
-    }
+  .record-block {
+    padding: 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
+  }
 
-    .employee-card {
-        padding: 0.75rem 1rem;
-    }
+  .record-block p {
+    margin: 0.5rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    line-height: 1.4;
+  }
 
-    .promo-section h2 {
-        font-size: 1.2rem;
-    }
+  .record-block p strong {
+    font-weight: 600;
+  }
 
-    .promo-section p {
-        font-size: 1rem;
-    }
+  .record-block .wrap-text {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .btn-secondary,
+  .record-form button,
+  .big-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  nav a,
+  .navbar a {
+    display: block;
+    margin: 0.25rem 0;
+  }
+
+  .employee-card {
+    padding: 0.75rem 1rem;
+  }
+
+  .promo-section h2 {
+    font-size: 1.2rem;
+  }
+
+  .promo-section p {
+    font-size: 1rem;
+  }
 }
 
 /* Футер */
