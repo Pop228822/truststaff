@@ -642,8 +642,32 @@ def generate_consent_pdf(
 from app.routes import onboarding
 app.include_router(onboarding.router)
 
+@app.get("/record/{record_id}/edit", response_class=HTMLResponse)
+def edit_record_form(
+    request: Request,
+    record_id: int,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(only_approved_user)
+):
+    if current_user.is_blocked:
+        response = RedirectResponse(url="/login", status_code=302)
+        response.delete_cookie("access_token")
+        return response
+    record = db.query(ReputationRecord).filter(
+        ReputationRecord.id == record_id,
+        ReputationRecord.employer_id == current_user.id
+    ).first()
+    if not record:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse("edit_record.html", {
+        "request": request,
+        "record": record,
+        "error": None
+    })
+
 @app.post("/record/{record_id}/edit")
 def edit_record(
+    request: Request,
     record_id: int,
     position: str = Form(...),
     hired_at: str = Form(...),
@@ -658,6 +682,33 @@ def edit_record(
         response = RedirectResponse(url="/login", status_code=302)
         response.delete_cookie("access_token")
         return response
+
+    position = position.strip()
+    hired_at = hired_at.strip()
+    fired_at = (fired_at or "").strip()
+    misconduct = (misconduct or "").strip()
+    dismissal_reason = (dismissal_reason or "").strip()
+    commendation = (commendation or "").strip()
+
+    for name, val in {
+        "Должность": position,
+        "Нарушение": misconduct,
+        "Причина увольнения": dismissal_reason,
+        "Поощрение": commendation
+    }.items():
+        if val and len(val) > MAX_TEXT_LENGTH:
+            record = db.query(ReputationRecord).filter(
+                ReputationRecord.id == record_id,
+                ReputationRecord.employer_id == current_user.id
+            ).first()
+            if not record:
+                raise HTTPException(status_code=404)
+            return templates.TemplateResponse("edit_record.html", {
+                "request": request,
+                "record": record,
+                "error": f"{name} не может превышать {MAX_TEXT_LENGTH} символов"
+            })
+
     record = db.query(ReputationRecord).filter(
         ReputationRecord.id == record_id,
         ReputationRecord.employer_id == current_user.id
@@ -666,11 +717,27 @@ def edit_record(
         raise HTTPException(status_code=404)
 
     try:
-        record.hired_at = datetime.strptime(hired_at, "%Y-%m-%d")
+        hired_dt = datetime.strptime(hired_at, "%Y-%m-%d")
     except ValueError:
-        raise HTTPException(status_code=400, detail="Некорректная дата приёма")
+        return templates.TemplateResponse("edit_record.html", {
+            "request": request,
+            "record": record,
+            "error": "Некорректная дата приёма"
+        })
 
-    record.fired_at = datetime.strptime(fired_at, "%Y-%m-%d") if fired_at else None
+    fired_dt = None
+    if fired_at:
+        try:
+            fired_dt = datetime.strptime(fired_at, "%Y-%m-%d")
+        except ValueError:
+            return templates.TemplateResponse("edit_record.html", {
+                "request": request,
+                "record": record,
+                "error": "Некорректная дата увольнения"
+            })
+
+    record.hired_at = hired_dt
+    record.fired_at = fired_dt
     record.position = position
     record.misconduct = misconduct or None
     record.dismissal_reason = dismissal_reason or None
