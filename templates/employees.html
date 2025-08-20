@@ -18,17 +18,44 @@
                 <div class="record-list">
                     {% for r in emp.records %}
                         <div class="record-block">
-                            <p><strong>📌 Должность:</strong> {{ r.position }}</p>
-                            <p><strong>🗓 Принят:</strong> {{ r.hired_at }}
-                            {% if r.fired_at %} → <strong>Уволен:</strong> {{ r.fired_at }}{% endif %}</p>
+                            <p>
+                                <strong>📌 Должность:</strong>
+                                <span class="wrap-text">{{ r.position }}</span>
+                            </p>
 
-                            {% if r.commendation %}<p><strong>👍 Похвала:</strong> {{ r.commendation }}</p>{% endif %}
-                            {% if r.misconduct %}<p><strong>⚠ Нарушения:</strong> {{ r.misconduct }}</p>{% endif %}
-                            {% if r.dismissal_reason %}<p><strong>🚪 Причина увольнения:</strong> {{ r.dismissal_reason }}</p>{% endif %}
+                            <p>
+                                <strong>🗓 Принят:</strong> {{ r.hired_at }}
+                                {% if r.fired_at %}
+                                    → <strong>Уволен:</strong> {{ r.fired_at }}
+                                {% endif %}
+                            </p>
+
+                            {% if r.commendation %}
+                                <p>
+                                    <strong>👍 Похвала:</strong>
+                                    <span class="wrap-text">{{ r.commendation }}</span>
+                                </p>
+                            {% endif %}
+
+                            {% if r.misconduct %}
+                                <p>
+                                    <strong>⚠ Нарушения:</strong>
+                                    <span class="wrap-text">{{ r.misconduct }}</span>
+                                </p>
+                            {% endif %}
+
+                            {% if r.dismissal_reason %}
+                                <p>
+                                    <strong>🚪 Причина увольнения:</strong>
+                                    <span class="wrap-text">{{ r.dismissal_reason }}</span>
+                                </p>
+                            {% endif %}
 
                             <div class="form-actions">
                                 <a href="/record/{{ r.id }}/edit">✏ Редактировать</a>
-                                <form method="post" action="/record/{{ r.id }}/delete" onsubmit="return confirm('Удалить запись?');">
+                                <form method="post"
+                                      action="/record/{{ r.id }}/delete"
+                                      onsubmit="return confirm('Удалить запись?');">
                                     <button type="submit" class="btn-secondary">🗑 Удалить</button>
                                 </form>
                             </div>

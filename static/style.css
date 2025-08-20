@@ -584,3 +584,9 @@ button.reject {
 .countdown-text {
   color: red;
 }
+
+.wrap-text{
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  white-space:pre-wrap;
+}
