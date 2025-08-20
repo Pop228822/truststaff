@@ -590,3 +590,9 @@ button.reject {
     word-wrap: break-word; /* перенос длинных слов */
     overflow-wrap: anywhere; /* переносит очень длинные последовательности */
 }
+
+.record-block p {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
