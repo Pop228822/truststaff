@@ -494,6 +494,8 @@ def list_employees(
 def record_form(request: Request, employee_id: int):
     return templates.TemplateResponse("add_record.html", {"request": request, "employee_id": employee_id})
 
+MAX_TEXT_LENGTH = 500
+
 @app.post("/employee/{employee_id}/add-record")
 def add_record(
     request: Request,
@@ -511,6 +513,20 @@ def add_record(
         response = RedirectResponse(url="/login", status_code=302)
         response.delete_cookie("access_token")
         return response
+
+    for field_name, field_value in {
+        "Должность": position,
+        "Нарушение": misconduct,
+        "Причина увольнения": dismissal_reason,
+        "Поощрение": commendation
+    }.items():
+        if field_value and len(field_value) > MAX_TEXT_LENGTH:
+            return templates.TemplateResponse("add_record.html", {
+                "request": request,
+                "employee_id": employee_id,
+                "error": f"{field_name} не может превышать {MAX_TEXT_LENGTH} символов"
+            })
+
     # Считаем, сколько записей ReputationRecord уже есть у текущего пользователя по этому сотруднику
     existing_records_count = db.query(ReputationRecord).filter(
         ReputationRecord.employee_id == employee_id,
