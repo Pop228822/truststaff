@@ -297,25 +297,24 @@ button.reject {
   }
 
   .burger {
-    display: none;
+    display: flex;
     width: 40px;
     height: 40px;
     margin-left: auto;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     background: #fff;
-    flex-direction: column;   /* ← вертикально */
     align-items: center;
     justify-content: center;
-    gap: 5px;                 /* расстояние между полосками */
-   }
+    gap: 4px;
+  }
 
   .burger-bar {
+    display: block;
     width: 22px;
     height: 2px;
     background: #2c3e50;
-    border-radius: 1px;
-   }
+  }
 
   .navbar {
     display: block;
