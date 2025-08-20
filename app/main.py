@@ -409,14 +409,29 @@ def add_employee(
                 "error": "Имя содержит недопустимые слова"
             })
 
-    # Проверка даты
     try:
-        dt = datetime.strptime(birth_date, "%Y-%m-%d")
-        if dt > datetime.now():
+        dt = datetime.strptime(birth_date, "%Y-%m-%d").date()
+        today = datetime.now().date()
+        age = today.year - dt.year - ((today.month, today.day) < (dt.month, dt.day))
+
+        if dt > today:
             return templates.TemplateResponse("add_employee.html", {
                 "request": request,
                 "error": "Дата рождения не может быть в будущем"
             })
+
+        if age < 14:
+            return templates.TemplateResponse("add_employee.html", {
+                "request": request,
+                "error": "Возраст сотрудника должен быть не меньше 14 лет"
+            })
+
+        if age > 100:
+            return templates.TemplateResponse("add_employee.html", {
+                "request": request,
+                "error": "Возраст сотрудника не может быть больше 100 лет"
+            })
+
     except ValueError:
         return templates.TemplateResponse("add_employee.html", {
             "request": request,
