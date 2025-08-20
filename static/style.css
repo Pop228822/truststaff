@@ -587,7 +587,7 @@ button.reject {
 
 .record-block p,
 .wrap-text {
-    white-space: pre-wrap;    /* переносы строк и сохранение \n */
-    word-break: break-all;    /* ломает даже длинные слова без пробелов */
-    overflow-wrap: anywhere;  /* дополнительная гарантия переноса */
+    white-space: pre-wrap;       /* сохраняем переносы строк */
+    overflow-wrap: anywhere;     /* ломает слова где угодно */
+    word-break: break-word;      /* доп. поддержка для Safari/старых браузеров */
 }
