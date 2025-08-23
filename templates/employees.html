@@ -2,6 +2,8 @@
 {% block content %}
 <h2>Мои сотрудники</h2>
 
+<p><a href="/add_employee">Добавить сотрудника</a></p>
+
 <div class="employee-cards">
     {% for emp in employees %}
         <div class="employee-card">
@@ -63,7 +65,15 @@
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="mt-1rem"><em>Нет записей</em></p>
+                <div class="record-block mt-1rem text-center">
+                  <p class="fs-italic text-gray mb-1rem">
+                    Нет записей. Перед тем как добавить запись, подпишите согласие с сотрудником.
+                  </p>
+                  <div class="promo-cta">
+                    <a href="/consent_form" class="big-button">Сформировать согласие</a>
+                    <a href="/terms" class="btn-secondary">Пользовательское соглашение</a>
+                  </div>
+                </div>
             {% endif %}
         </div>
     {% endfor %}
