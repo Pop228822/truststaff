@@ -5,79 +5,79 @@
 <p><a href="/add-employee">Добавить сотрудника</a></p>
 
 <div class="employee-cards">
-    {% for emp in employees %}
-        <div class="employee-card">
-            <h4>{{ emp.full_name }}</h4>
-            <p><strong>Дата рождения:</strong> {{ emp.birth_date }}</p>
-            <p><strong>Контакт:</strong> {{ emp.contact }}</p>
+  {% for emp in employees %}
+    <div class="employee-card">
+      <h4>{{ emp.full_name }}</h4>
+      <p><strong>Дата рождения:</strong> {{ emp.birth_date }}</p>
+      {% if emp.contact %}
+        <p><strong>Контакт:</strong> {{ emp.contact }}</p>
+      {% endif %}
 
-            <div class="form-actions mt-0_5rem">
-                <a href="/employee/{{ emp.id }}/generate-consent">📄 Получить согласие</a>
-                <a href="/employee/{{ emp.id }}/add-record">+ Добавить запись</a>
+      <div class="form-actions mt-0_5rem">
+        <a href="/employee/{{ emp.id }}/generate-consent">📄 Получить согласие</a>
+        <a href="/employee/{{ emp.id }}/add-record">+ Добавить запись</a>
+      </div>
+
+      {% if emp.records %}
+        <div class="record-list">
+          {% for r in emp.records %}
+            <div class="record-block">
+              <p>
+                <strong>📌 Должность:</strong>
+                <span class="wrap-text">{{ r.position }}</span>
+              </p>
+
+              <p><strong>🗓 Принят:</strong> {{ r.hired_at }}</p>
+              {% if r.fired_at %}
+                <p><strong>🚪 Уволен:</strong> {{ r.fired_at }}</p>
+              {% endif %}
+
+              {% if r.commendation %}
+                <p>
+                  <strong>👍 Похвала:</strong>
+                  <span class="wrap-text">{{ r.commendation }}</span>
+                </p>
+              {% endif %}
+
+              {% if r.misconduct %}
+                <p>
+                  <strong>⚠ Нарушения:</strong>
+                  <span class="wrap-text">{{ r.misconduct }}</span>
+                </p>
+              {% endif %}
+
+              {% if r.dismissal_reason %}
+                <p>
+                  <strong>📦 Причина увольнения:</strong>
+                  <span class="wrap-text">{{ r.dismissal_reason }}</span>
+                </p>
+              {% endif %}
+
+              <div class="form-actions">
+                <a href="/record/{{ r.id }}/edit">✏ Редактировать</a>
+                <form method="post"
+                      action="/record/{{ r.id }}/delete"
+                      onsubmit="return confirm('Удалить запись?');"
+                      class="inline-block-form">
+                  <button type="submit" class="btn-secondary">🗑 Удалить</button>
+                </form>
+              </div>
             </div>
-
-            {% if emp.records %}
-                <div class="record-list">
-                    {% for r in emp.records %}
-                        <div class="record-block">
-                            <p>
-                                <strong>📌 Должность:</strong>
-                                <span class="wrap-text">{{ r.position }}</span>
-                            </p>
-
-                            <p>
-                                <strong>🗓 Принят:</strong> {{ r.hired_at }}
-                                {% if r.fired_at %}
-                                    → <strong>Уволен:</strong> {{ r.fired_at }}
-                                {% endif %}
-                            </p>
-
-                            {% if r.commendation %}
-                                <p>
-                                    <strong>👍 Похвала:</strong>
-                                    <span class="wrap-text">{{ r.commendation }}</span>
-                                </p>
-                            {% endif %}
-
-                            {% if r.misconduct %}
-                                <p>
-                                    <strong>⚠ Нарушения:</strong>
-                                    <span class="wrap-text">{{ r.misconduct }}</span>
-                                </p>
-                            {% endif %}
-
-                            {% if r.dismissal_reason %}
-                                <p>
-                                    <strong>🚪 Причина увольнения:</strong>
-                                    <span class="wrap-text">{{ r.dismissal_reason }}</span>
-                                </p>
-                            {% endif %}
-
-                            <div class="form-actions">
-                                <a href="/record/{{ r.id }}/edit">✏ Редактировать</a>
-                                <form method="post"
-                                      action="/record/{{ r.id }}/delete"
-                                      onsubmit="return confirm('Удалить запись?');"
-                                      class="inline-block-form">
-                                    <button type="submit" class="btn-secondary">🗑 Удалить</button>
-                                </form>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="record-block mt-1rem text-center">
-                  <p class="fs-italic text-gray mb-1rem">
-                    Нет записей. Перед тем как добавить запись, подпишите согласие с сотрудником.
-                  </p>
-                  <div class="promo-cta">
-                    <a href="/employee/{{ emp.id }}/generate-consent" class="big-button">📄 Получить согласие</a>
-                    <a href="/terms" class="btn-secondary">Пользовательское соглашение</a>
-                  </div>
-                </div>
-            {% endif %}
+          {% endfor %}
         </div>
-    {% endfor %}
+      {% else %}
+        <div class="record-block mt-1rem text-center">
+          <p class="fs-italic text-gray mb-1rem">
+            Нет записей. Перед тем как добавить запись, подпишите согласие с сотрудником.
+          </p>
+          <div class="promo-cta">
+            <a href="/employee/{{ emp.id }}/generate-consent" class="big-button">📄 Получить согласие</a>
+            <a href="/terms" class="btn-secondary">Пользовательское соглашение</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
 </div>
 
 <p><a href="/">← На главную</a></p>
