@@ -13,6 +13,43 @@ templates = Jinja2Templates(directory="templates")
 
 router = APIRouter()
 
+
+from sqlalchemy import text
+
+def inc_check(db, employee_id: int):
+    db.execute(
+        text("""
+            UPDATE employee
+            SET checks_count = checks_count + 1,
+                last_checked_at = NOW()
+            WHERE id = :id
+        """),
+        {"id": employee_id}
+    )
+    db.commit()
+
+def add_like(db, employee_id: int):
+    db.execute(
+        text("""
+            UPDATE employee
+            SET likes_count = likes_count + 1
+            WHERE id = :id
+        """),
+        {"id": employee_id}
+    )
+    db.commit()
+
+def add_dislike(db, employee_id: int):
+    db.execute(
+        text("""
+            UPDATE employee
+            SET dislikes_count = dislikes_count + 1
+            WHERE id = :id
+        """),
+        {"id": employee_id}
+    )
+    db.commit()
+
 @router.get("/check", response_class=HTMLResponse)
 def check_form(
     request: Request,
@@ -65,8 +102,11 @@ def check_employee(
         query = query.filter(Employee.birth_date == birth_date)
 
     employees = query.all()
-    result = []
 
+    for emp in employees:
+        inc_check(db, emp.id)
+
+    result = []
     for emp in employees:
         records = db.query(ReputationRecord).filter(ReputationRecord.employee_id == emp.id).all()
         prepared_records = []
@@ -92,7 +132,6 @@ def check_employee(
                     "dismissal_reason": record.dismissal_reason,
                     "commendation": record.commendation,
                 })
-
         result.append({
             "full_name": emp.full_name,
             "birth_date": emp.birth_date,

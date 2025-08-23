@@ -32,6 +32,11 @@ class Employee(SQLModel, table=True):
     birth_date: date
     contact: Optional[str] = None
     created_by_user_id: int = Field(foreign_key="user.id")
+
+    checks_count: int = Field(default=0)  # «пробивы» (запросы проверки)
+    likes_count: int = Field(default=0)
+    dislikes_count: int = Field(default=0)
+
     records: List["ReputationRecord"] = Relationship(back_populates="employee")
 
 

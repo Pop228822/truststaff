@@ -18,7 +18,7 @@
         </div>
 
         <div class="form-actions">
-            <button type="submit" class="big-button w-full">Проверить</button>
+            <button type="submit" class="big-button">Проверить</button>
         </div>
     </form>
 </div>
@@ -27,26 +27,30 @@
 <div class="record-form mt-2rem">
     {% if result %}
         <h3>⚠ Найдено {{ result|length }} совпадений:</h3>
+
         <div class="employee-cards">
         {% for emp in result %}
             <div class="employee-card">
                 <h4>{{ emp.full_name }}{% if emp.birth_date %}, {{ emp.birth_date }}{% endif %}</h4>
+
+                <p class="text-gray">
+                    🛡 Пробивы: {{ emp.checks_count }} • 👍 {{ emp.likes_count }} • 👎 {{ emp.dislikes_count }}
+                </p>
+
                 <p><strong>Нарушений:</strong> {{ emp.record_count }}</p>
 
                 {% for r in emp.records %}
                     {% if r.is_blocked_employer %}
-                        <!-- Если работодатель заблокирован -->
-                        <div class="record-block" style="color: red;">
-                            <p>🔒 Предприниматель заблокирован, отзыв неактуален.</p>
+                        <div class="record-block">
+                            <p class="text-red">🔒 Предприниматель заблокирован, отзыв неактуален.</p>
                         </div>
                     {% else %}
-                        <!-- Обычные данные о нарушениях/похвалах -->
                         <div class="record-block">
                             <p><strong>📌 Должность:</strong> {{ r.position }}</p>
-                            <p><strong>🗓 Принят:</strong> {{ r.hired_at }}
-                            {% if r.fired_at %}
-                                → <strong>Уволен:</strong> {{ r.fired_at }}
-                            {% endif %}</p>
+                            <p>
+                                <strong>🗓 Принят:</strong> {{ r.hired_at }}
+                                {% if r.fired_at %} → <strong>Уволен:</strong> {{ r.fired_at }}{% endif %}
+                            </p>
                             {% if r.commendation %}
                                 <p><strong>👍 Похвала:</strong> {{ r.commendation }}</p>
                             {% endif %}
