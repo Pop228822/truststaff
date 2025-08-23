@@ -62,10 +62,10 @@
                     {% else %}
                         <div class="record-block">
                             <p><strong>📌 Должность:</strong> {{ r.position }}</p>
-                            <p>
-                                <strong>🗓 Принят:</strong> {{ r.hired_at }}
-                                {% if r.fired_at %} → <strong>Уволен:</strong> {{ r.fired_at }}{% endif %}
-                            </p>
+                            <p><strong>🗓 Принят:</strong> {{ r.hired_at }}</p>
+                            {% if r.fired_at %}
+                              <p><strong>🚪 Уволен:</strong> {{ r.fired_at }}</p>
+                            {% endif %}
                             {% if r.commendation %}
                                 <p><strong>👍 Похвала:</strong> {{ r.commendation }}</p>
                             {% endif %}
