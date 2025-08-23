@@ -2,7 +2,7 @@
 {% block content %}
 <h2>Мои сотрудники</h2>
 
-<p><a href="/add_employee">Добавить сотрудника</a></p>
+<p><a href="{{ url_for('add_employee') }}">Добавить сотрудника</a></p>
 
 <div class="employee-cards">
     {% for emp in employees %}
@@ -12,8 +12,8 @@
             <p><strong>Контакт:</strong> {{ emp.contact }}</p>
 
             <div class="form-actions mt-0_5rem">
-                <a href="/employee/{{ emp.id }}/generate-consent">📄 Получить согласие</a>
-                <a href="/employee/{{ emp.id }}/add-record">+ Добавить запись</a>
+                <a href="{{ url_for('generate_consent', emp_id=emp.id) }}">📄 Получить согласие</a>
+                <a href="{{ url_for('add_record', emp_id=emp.id) }}">+ Добавить запись</a>
             </div>
 
             {% if emp.records %}
@@ -54,9 +54,9 @@
                             {% endif %}
 
                             <div class="form-actions">
-                                <a href="/record/{{ r.id }}/edit">✏ Редактировать</a>
+                                <a href="{{ url_for('edit_record', record_id=r.id) }}">✏ Редактировать</a>
                                 <form method="post"
-                                      action="/record/{{ r.id }}/delete"
+                                      action="{{ url_for('delete_record', record_id=r.id) }}"
                                       onsubmit="return confirm('Удалить запись?');">
                                     <button type="submit" class="btn-secondary">🗑 Удалить</button>
                                 </form>
@@ -70,8 +70,8 @@
                     Нет записей. Перед тем как добавить запись, подпишите согласие с сотрудником.
                   </p>
                   <div class="promo-cta">
-                    <a href="/consent_form" class="big-button">Сформировать согласие</a>
-                    <a href="/terms" class="btn-secondary">Пользовательское соглашение</a>
+                    <a href="{{ url_for('generate_consent', emp_id=emp.id) }}" class="big-button">📄 Получить согласие</a>
+                    <a href="{{ url_for('user_agreement') }}" class="btn-secondary">Пользовательское соглашение</a>
                   </div>
                 </div>
             {% endif %}
@@ -79,5 +79,5 @@
     {% endfor %}
 </div>
 
-<p><a href="/">← На главную</a></p>
+<p><a href="{{ url_for('index') }}">← На главную</a></p>
 {% endblock %}
