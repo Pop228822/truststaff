@@ -697,3 +697,24 @@ button.reject {
     overflow-wrap: anywhere;     /* ломает слова где угодно */
     word-break: break-word;      /* доп. поддержка для Safari/старых браузеров */
 }
+
+/* Красивое выравнивание ключ-значение в record-block */
+.record-block p {
+    display: grid;
+    grid-template-columns: auto 1fr; /* ключ компактный, значение занимает остальное */
+    align-items: baseline;
+    gap: 0.5rem;
+    margin: 0.4rem 0;
+}
+
+.record-block p strong {
+    white-space: nowrap; /* не переносим иконку+лейбл */
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+/* Чтобы значение всегда аккуратно переносилось */
+.record-block p span,
+.record-block p {
+    word-break: break-word;
+}
