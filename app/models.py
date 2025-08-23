@@ -1,3 +1,4 @@
+from sqlalchemy import UniqueConstraint
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional
 from datetime import datetime, date
@@ -86,3 +87,15 @@ class RateLimit(SQLModel, table=True):
     ip_address: str = Field(primary_key=True)
     request_count: int
     window_start: datetime
+
+
+class EmployeeReaction(SQLModel, table=True):
+    __tablename__ = "employee_reaction"
+    __table_args__ = (UniqueConstraint("employee_id", "employer_id", name="uq_employee_employer"),)
+
+    id: Optional[int] = Field(default=None, primary_key=True)
+    employee_id: int = Field(foreign_key="employee.id", index=True)
+    employer_id: int = Field(foreign_key="user.id", index=True)
+    reaction: str  # 'like' | 'dislike'
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)

@@ -38,11 +38,17 @@
                 </p>
 
                 <div class="form-actions">
-                  <form method="post" action="/employee/{{ emp.employee_id }}/like" class="inline-form">
-                    <button type="submit" class="approve">👍 Нравится ({{ emp.likes_count }})</button>
+                  <form method="post" action="/employee/{{ emp.employee_id }}/react" class="inline-form">
+                    <input type="hidden" name="reaction" value="like">
+                    <button type="submit" class="approve">
+                      👍 Нравится ({{ emp.likes_count }}){% if emp.my_reaction == 'like' %} ✓{% endif %}
+                    </button>
                   </form>
-                  <form method="post" action="/employee/{{ emp.employee_id }}/dislike" class="inline-form">
-                    <button type="submit" class="reject">👎 Не нравится ({{ emp.dislikes_count }})</button>
+                  <form method="post" action="/employee/{{ emp.employee_id }}/react" class="inline-form">
+                    <input type="hidden" name="reaction" value="dislike">
+                    <button type="submit" class="reject">
+                      👎 Не нравится ({{ emp.dislikes_count }}){% if emp.my_reaction == 'dislike' %} ✓{% endif %}
+                    </button>
                   </form>
                 </div>
 
