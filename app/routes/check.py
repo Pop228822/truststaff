@@ -44,6 +44,30 @@ def add_dislike(db: Session, employee_id: int) -> None:
 
 # === Роуты ===
 
+@router.post("/employee/{emp_id}/like")
+def like_employee(
+    emp_id: int,
+    request: Request,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(only_approved_user)
+):
+    add_like(db, emp_id)
+    referer = request.headers.get("referer") or "/check"
+    return RedirectResponse(referer, status_code=303)
+
+
+@router.post("/employee/{emp_id}/dislike")
+def dislike_employee(
+    emp_id: int,
+    request: Request,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(only_approved_user)
+):
+    add_dislike(db, emp_id)
+    referer = request.headers.get("referer") or "/check"
+    return RedirectResponse(referer, status_code=303)
+
+
 @router.get("/check", response_class=HTMLResponse)
 def check_form(
     request: Request,
@@ -108,7 +132,6 @@ def check_employee(
 
     employees = q.all()
 
-    # Инкремент «пробивов» за один SQL по найденным id
     inc_check_bulk(db, [e.id for e in employees])
 
     # Формируем результат
@@ -117,7 +140,7 @@ def check_employee(
         records = db.query(ReputationRecord).filter(ReputationRecord.employee_id == emp.id).all()
         prepared_records = []
         for record in records:
-            employer = db.get(User, record.employer_id)  # безопаснее, чем query(...).get(...)
+            employer = db.get(User, record.employer_id)
             if employer and employer.is_blocked:
                 prepared_records.append({
                     "is_blocked_employer": True,
@@ -141,7 +164,6 @@ def check_employee(
             "birth_date": emp.birth_date,
             "records": prepared_records,
             "record_count": len(prepared_records),
-            # если модель уже с полями — можно вывести их в шаблоне
             "checks_count": getattr(emp, "checks_count", 0),
             "likes_count": getattr(emp, "likes_count", 0),
             "dislikes_count": getattr(emp, "dislikes_count", 0),

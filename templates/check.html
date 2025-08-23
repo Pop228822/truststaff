@@ -37,6 +37,15 @@
                     🛡 Пробивы: {{ emp.checks_count }} • 👍 {{ emp.likes_count }} • 👎 {{ emp.dislikes_count }}
                 </p>
 
+                <div class="form-actions">
+                  <form method="post" action="/employee/{{ emp.employee_id }}/like" class="inline-form">
+                    <button type="submit" class="approve">👍 Нравится ({{ emp.likes_count }})</button>
+                  </form>
+                  <form method="post" action="/employee/{{ emp.employee_id }}/dislike" class="inline-form">
+                    <button type="submit" class="reject">👎 Не нравится ({{ emp.dislikes_count }})</button>
+                  </form>
+                </div>
+
                 <p><strong>Нарушений:</strong> {{ emp.record_count }}</p>
 
                 {% for r in emp.records %}
