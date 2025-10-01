@@ -15,7 +15,6 @@ import os
 
 from app.auth_redirect import AuthRedirectMiddleware
 from app.limit import rate_limit_100_per_minute
-from app.routes.api_auth import only_approved_api_user, get_api_user
 
 load_dotenv()
 from app.auth import (
@@ -38,31 +37,12 @@ app = FastAPI(
 app.add_middleware(AuthRedirectMiddleware)
 app.add_middleware(SecurityHeadersMiddleware)
 templates = Jinja2Templates(directory="templates")
-from app.auth import optional_user
-from app.routes import superadmin
+from app.routes import superadmin, pages
 app.include_router(superadmin.router)
+app.include_router(pages.router)
 
 MAX_EMPLOYERS_COUNT = 30
 
-@app.get("/policy", response_class=HTMLResponse)
-def policy(request: Request):
-    return templates.TemplateResponse("policy.html", {"request": request})
-
-@app.get("/terms", response_class=HTMLResponse)
-def terms(request: Request):
-    return templates.TemplateResponse("terms.html", {"request": request})
-
-@app.get("/", response_class=HTMLResponse)
-def root(
-    request: Request,
-    user: Optional[User] = Depends(optional_user)
-):
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "user": user,
-        "verification_status": user.verification_status if user else None,
-        "rejection_reason": user.rejection_reason if user else None
-    })
 
 
 @app.get("/register", response_class=HTMLResponse)
