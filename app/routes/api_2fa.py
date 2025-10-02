@@ -18,7 +18,8 @@ class TwoFactorRequest(BaseModel):
 
 @router.post("/verify-2fa")
 def verify_2fa_api(data: TwoFactorRequest, db: Session = Depends(get_session)):
-    user = db.query(User).filter(User.email == data.email).first()
+    clean_email = data.email.lower()  # Приводим email к нижнему регистру
+    user = db.query(User).filter(User.email == clean_email).first()
     if not user:
         raise HTTPException(status_code=404, detail="user_not_found")
 
@@ -43,7 +44,8 @@ class EmailRequest(BaseModel):
 
 @router.post("/resend-2fa")
 def resend_2fa(data: EmailRequest, db: Session = Depends(get_session)):
-    user = db.query(User).filter(User.email == data.email).first()
+    clean_email = data.email.lower()  # Приводим email к нижнему регистру
+    user = db.query(User).filter(User.email == clean_email).first()
     if not user:
         raise HTTPException(status_code=404, detail="user_not_found")
 

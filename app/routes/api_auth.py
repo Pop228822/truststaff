@@ -22,7 +22,8 @@ class LoginRequest(BaseModel):
 
 @router.post("/login")
 def api_login(data: LoginRequest, db: Session = Depends(get_session)):
-    user = db.query(User).filter(User.email == data.email).first()
+    clean_email = data.email.lower()  # Приводим email к нижнему регистру
+    user = db.query(User).filter(User.email == clean_email).first()
     if not user or not verify_password(data.password, user.password_hash):
         raise HTTPException(status_code=401, detail="Неверный логин или пароль")
 

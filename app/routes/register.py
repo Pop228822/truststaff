@@ -69,14 +69,14 @@ def register_user(
         })
 
     # Проверка существующих пользователей
-    existing_user = session.query(User).filter(User.email == email).first()
+    existing_user = session.query(User).filter(User.email == clean_email).first()
     if existing_user:
         return templates.TemplateResponse("register.html", {
             "request": request,
             "error": "Email уже зарегистрирован"
         })
 
-    existing_pending = session.query(PendingUser).filter(PendingUser.email == email).first()
+    existing_pending = session.query(PendingUser).filter(PendingUser.email == clean_email).first()
     if existing_pending:
         return templates.TemplateResponse("register.html", {
             "request": request,
@@ -87,7 +87,7 @@ def register_user(
     token = secrets.token_urlsafe(32)
     pending = PendingUser(
         name=clean_name,
-        email=email,
+        email=clean_email,
         password_hash=hash_password(password),
         email_verification_token=token
     )
@@ -95,7 +95,7 @@ def register_user(
     session.commit()
 
     # Отправка email для верификации
-    send_verification_email(email, token)
+    send_verification_email(clean_email, token)
 
     return templates.TemplateResponse("register_success.html", {
         "request": request,
@@ -121,7 +121,7 @@ def verify_email(request: Request, token: str, session: Session = Depends(get_se
     # Создание настоящего пользователя
     new_user = User(
         name=pending.name,
-        email=pending.email,
+        email=pending.email.lower(),  # Убеждаемся что email в нижнем регистре
         password_hash=pending.password_hash,
         is_email_verified=True,
         email_verification_token=None,

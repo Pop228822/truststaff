@@ -20,11 +20,13 @@ class RegisterRequest(BaseModel):
 
 @router.post("/api/register")
 def api_register_user(data: RegisterRequest, session: Session = Depends(get_session)):
+    clean_email = data.email.lower()  # Приводим email к нижнему регистру
+    
     # 1. Проверка дубликатов
-    if session.query(User).filter(User.email == data.email).first():
+    if session.query(User).filter(User.email == clean_email).first():
         raise HTTPException(status_code=400, detail="Email уже зарегистрирован")
 
-    if session.query(PendingUser).filter(PendingUser.email == data.email).first():
+    if session.query(PendingUser).filter(PendingUser.email == clean_email).first():
         raise HTTPException(status_code=400, detail="На этот email уже есть незавершённая регистрация")
 
     # 2. Генерация токена
@@ -33,14 +35,14 @@ def api_register_user(data: RegisterRequest, session: Session = Depends(get_sess
     # 3. Создание PendingUser
     pending = PendingUser(
         name=data.name,
-        email=data.email,
+        email=clean_email,
         password_hash=hash_password(data.password),
         email_verification_token=token
     )
     session.add(pending)
     session.commit()
 
-    send_verification_email(data.email, token)
+    send_verification_email(clean_email, token)
 
     # 5. Ответ
     return JSONResponse(content={"status": "ok"})
@@ -58,7 +60,7 @@ def api_verify_email(token: str, session: Session = Depends(get_session)):
     # 2. Создание User
     user = User(
         name=pending.name,
-        email=pending.email,
+        email=pending.email.lower(),  # Убеждаемся что email в нижнем регистре
         password_hash=pending.password_hash,
         is_email_verified=True,
         email_verification_token=None,

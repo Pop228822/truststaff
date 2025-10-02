@@ -51,9 +51,10 @@ def login_user(
 ):
     """Обработка входа пользователя"""
     ip = request.client.host
+    clean_email = email.lower()  # Приводим email к нижнему регистру
 
     # Проверка на брутфорс
-    if is_brute_force(session, email, ip):
+    if is_brute_force(session, clean_email, ip):
         return templates.TemplateResponse("login.html", {
             "request": request,
             "error": "Слишком много попыток входа. Попробуйте через 15 минут."
@@ -67,9 +68,9 @@ def login_user(
         })
 
     # Поиск пользователя и проверка пароля
-    user = session.query(User).filter(User.email == email).first()
+    user = session.query(User).filter(User.email == clean_email).first()
     if not user or not verify_password(password, user.password_hash):
-        log_login_attempt(session, email, ip, False)
+        log_login_attempt(session, clean_email, ip, False)
         return templates.TemplateResponse("login.html", {
             "request": request,
             "error": "Неверный логин или пароль"
@@ -90,7 +91,7 @@ def login_user(
         })
 
     # Логирование успешной попытки
-    log_login_attempt(session, email, ip, True)
+    log_login_attempt(session, clean_email, ip, True)
 
     # Генерация и отправка 2FA кода
     code = str(randint(100000, 999999))
@@ -119,7 +120,8 @@ def verify_2fa(
     session: Session = Depends(get_session)
 ):
     """Проверка 2FA кода"""
-    user = session.query(User).filter(User.email == email).first()
+    clean_email = email.lower()  # Приводим email к нижнему регистру
+    user = session.query(User).filter(User.email == clean_email).first()
     if not user:
         return templates.TemplateResponse("enter_2fa.html", {
             "request": request,
@@ -168,7 +170,8 @@ def resend_2fa_code(
     session: Session = Depends(get_session)
 ):
     """Повторная отправка 2FA кода"""
-    user = session.query(User).filter(User.email == email).first()
+    clean_email = email.lower()  # Приводим email к нижнему регистру
+    user = session.query(User).filter(User.email == clean_email).first()
     if not user:
         return templates.TemplateResponse("enter_2fa.html", {
             "request": request,

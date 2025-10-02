@@ -25,7 +25,8 @@ def forgot_password_send(
     email: str = Form(...),
     db: Session = Depends(get_session)
 ):
-    user = db.query(User).filter(User.email == email).first()
+    clean_email = email.lower()  # Приводим email к нижнему регистру
+    user = db.query(User).filter(User.email == clean_email).first()
 
     if user.is_blocked:
         return templates.TemplateResponse("forgot_password.html", {
@@ -63,7 +64,7 @@ def forgot_password_send(
     )
 
     # Отправляем письмо
-    send_ok = send_password_reset_email(to_addr=email, token=reset_token)
+    send_ok = send_password_reset_email(to_addr=clean_email, token=reset_token)
     if not send_ok:
         raise HTTPException(status_code=500, detail="Ошибка при отправке письма")
 

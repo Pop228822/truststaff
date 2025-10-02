@@ -18,7 +18,8 @@ def forgot_password_api(
     email: str = Form(...),
     db: Session = Depends(get_session)
 ):
-    user = db.query(User).filter(User.email == email).first()
+    clean_email = email.lower()  # Приводим email к нижнему регистру
+    user = db.query(User).filter(User.email == clean_email).first()
 
     # Возвращаем "ok" в любом случае, чтобы не раскрывать наличие пользователя
     if not user:
@@ -41,7 +42,7 @@ def forgot_password_api(
         expires_delta=timedelta(minutes=30)
     )
 
-    send_ok = send_password_reset_email(to_addr=email, token=reset_token)
+    send_ok = send_password_reset_email(to_addr=clean_email, token=reset_token)
     if not send_ok:
         raise HTTPException(status_code=500, detail="Ошибка при отправке письма")
 
