@@ -28,16 +28,17 @@ def forgot_password_send(
     clean_email = email.lower()  # Приводим email к нижнему регистру
     user = db.query(User).filter(User.email == clean_email).first()
 
-    if user.is_blocked:
-        return templates.TemplateResponse("forgot_password.html", {
-            "request": request,
-            "message": "Пользователь заблокирован!"
-        })
     # Чтобы не указывать, что пользователя нет, возвращаем "Письмо отправлено".
     if not user:
         return templates.TemplateResponse("forgot_password.html", {
             "request": request,
             "message": "Если пользователь существует, вы получите письмо для восстановления."
+        })
+
+    if user.is_blocked:
+        return templates.TemplateResponse("forgot_password.html", {
+            "request": request,
+            "message": "Пользователь заблокирован!"
         })
 
     # --- ДОБАВЛЯЕМ ПРОВЕРКУ, не прошло ли 60 секунд c момента последнего запроса ---
@@ -108,7 +109,11 @@ def reset_password_process(
 
     # 2. Декодируем токен
     try:
-        payload = jwt.decode(token, os.getenv("SECRET_KEY"), os.getenv("ALGORITHM"))
+        payload = jwt.decode(
+            token,
+            os.getenv("SECRET_KEY"),
+            algorithms=[os.getenv("ALGORITHM")]
+        )
     except ExpiredSignatureError:
         # Токен просрочен → показываем ту же страницу с сообщением
         return templates.TemplateResponse(
