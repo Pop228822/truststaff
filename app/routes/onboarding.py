@@ -1,5 +1,6 @@
 import os
 import shutil
+import requests
 from fastapi import APIRouter, Request, Form, File, UploadFile, Depends
 from starlette.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -13,9 +14,38 @@ templates = Jinja2Templates(directory="templates")
 
 router = APIRouter()
 
+# Telegram настройки
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+
 import uuid
 
 ALLOWED_EXTENSIONS = {"pdf", "png", "jpg", "jpeg"}
+
+
+def send_telegram_notification(user: User, company_name: str, city: str, inn_or_ogrn: str):
+    """Отправка уведомления в Telegram о новой заявке на верификацию"""
+    if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
+        return
+    
+    text = (
+        f"🔔 Новая заявка на верификацию!\n\n"
+        f"👤 Пользователь: {user.name} (ID: {user.id})\n"
+        f"📧 Email: {user.email}\n"
+        f"🏢 Компания: {company_name}\n"
+        f"🏙️ Город: {city}\n"
+        f"📋 ИНН/ОГРН: {inn_or_ogrn}\n"
+        f"📄 Документ: {user.passport_filename}\n\n"
+        f"⏰ Время подачи: {user.updated_at.strftime('%d.%m.%Y %H:%M') if user.updated_at else 'не указано'}"
+    )
+    
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
+            data={"chat_id": TELEGRAM_CHAT_ID, "text": text}
+        )
+    except Exception as e:
+        print(f"Ошибка отправки уведомления в Telegram: {e}")
 
 
 def generate_safe_filename(original_filename: str, user_id: int) -> str:
@@ -129,5 +159,8 @@ def submit_onboarding(
     user.verification_status = "pending"
     user.rejection_reason = None
     db.commit()
+
+    # Отправляем уведомление в Telegram
+    send_telegram_notification(user, company_name, city, inn_or_ogrn)
 
     return templates.TemplateResponse("onboarding_submitted.html", {"request": request})
