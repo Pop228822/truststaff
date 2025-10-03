@@ -28,6 +28,8 @@ def send_telegram_notification(user: User, company_name: str, city: str, inn_or_
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
         return
     
+    from datetime import datetime
+    
     text = (
         f"🔔 Новая заявка на верификацию!\n\n"
         f"👤 Пользователь: {user.name} (ID: {user.id})\n"
@@ -36,7 +38,7 @@ def send_telegram_notification(user: User, company_name: str, city: str, inn_or_
         f"🏙️ Город: {city}\n"
         f"📋 ИНН/ОГРН: {inn_or_ogrn}\n"
         f"📄 Документ: {user.passport_filename}\n\n"
-        f"⏰ Время подачи: {user.updated_at.strftime('%d.%m.%Y %H:%M') if user.updated_at else 'не указано'}"
+        f"⏰ Время подачи: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
     )
     
     try:
