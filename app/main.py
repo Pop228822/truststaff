@@ -1,6 +1,3 @@
-"""
-Главный файл приложения TrustStaff
-"""
 from dotenv import load_dotenv
 
 from app.config import create_app
@@ -12,7 +9,6 @@ from app.error_handlers import setup_error_handlers
 # Загружаем переменные окружения
 load_dotenv()
 
-# Создаем приложение
 app = create_app()
 
 # Настраиваем все компоненты
