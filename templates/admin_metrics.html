@@ -44,41 +44,44 @@
         </div>
         <div class="card-body">
             {% if metrics.requests_by_endpoint %}
-                <table class="metrics-table">
-                    <thead>
-                        <tr>
-                            <th>Endpoint</th>
-                            <th>Запросов</th>
-                            <th>Процент</th>
-                            <th>Прогресс</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for endpoint, count in metrics.requests_by_endpoint.items() %}
-                        {% set percentage = (count / metrics.total_requests * 100) if metrics.total_requests > 0 else 0 %}
-                        <tr>
-                            <td>
-                                <code>{{ endpoint }}</code>
-                            </td>
-                            <td>
-                                <span class="badge badge-primary">{{ count }}</span>
-                            </td>
-                            <td>{{ "%.1f"|format(percentage) }}%</td>
-                            <td>
-                                <div class="progress">
-                                    <div class="progress-bar" 
-                                         role="progressbar" 
-                                         style="width: {{ percentage }}%;"
-                                         aria-valuenow="{{ percentage }}" 
-                                         aria-valuemin="0" 
-                                         aria-valuemax="100">
+                <p class="table-scroll-hint">👈 Листайте таблицу влево-вправо 👉</p>
+                <div class="table-wrapper">
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>Endpoint</th>
+                                <th>Запросов</th>
+                                <th>Процент</th>
+                                <th>Прогресс</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for endpoint, count in metrics.requests_by_endpoint.items() %}
+                            {% set percentage = (count / metrics.total_requests * 100) if metrics.total_requests > 0 else 0 %}
+                            <tr>
+                                <td>
+                                    <code>{{ endpoint }}</code>
+                                </td>
+                                <td>
+                                    <span class="badge badge-primary">{{ count }}</span>
+                                </td>
+                                <td>{{ "%.1f"|format(percentage) }}%</td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar" 
+                                             role="progressbar" 
+                                             style="width: {{ percentage }}%;"
+                                             aria-valuenow="{{ percentage }}" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                        </div>
                                     </div>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <p>Нет данных о запросах</p>
             {% endif %}

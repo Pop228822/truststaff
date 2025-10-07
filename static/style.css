@@ -833,18 +833,51 @@ button.reject {
     background-color: #3498db;
 }
 
+/* Контейнер для таблицы с горизонтальным скроллом */
+.table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1rem 0;
+    position: relative;
+}
+
+/* Скроллбар для WebKit браузеров (Chrome, Safari) */
+.table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 /* Таблица метрик */
 .metrics-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1rem;
     background: #fff;
+    min-width: 600px; /* Минимальная ширина для комфортного просмотра */
 }
 
 .metrics-table th {
     border-top: none;
     font-weight: 600;
     background-color: #f8f9fa;
+    white-space: nowrap; /* Не переносить текст в заголовках */
+}
+
+.metrics-table td {
+    white-space: nowrap; /* Не переносить текст в ячейках */
 }
 
 .metrics-table code {
@@ -890,6 +923,15 @@ button.reject {
     margin: 0 0.5rem;
 }
 
+/* Подсказка о возможности скролла на мобильных */
+.table-scroll-hint {
+    display: none;
+    text-align: center;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
 /* Отзывчивый макет */
 @media (max-width: 768px) {
     .metrics-grid {
@@ -905,5 +947,15 @@ button.reject {
         margin: 0.5rem auto;
         width: 100%;
         max-width: 300px;
+    }
+    
+    /* Показываем подсказку о скролле на мобильных */
+    .table-scroll-hint {
+        display: block;
+    }
+    
+    /* Увеличиваем скроллбар на мобильных */
+    .table-wrapper::-webkit-scrollbar {
+        height: 12px;
     }
 }

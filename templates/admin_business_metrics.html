@@ -74,37 +74,40 @@
             <h5>👥 Распределение по ролям</h5>
         </div>
         <div class="card-body">
-            <table class="metrics-table">
-                <thead>
-                    <tr>
-                        <th>Роль</th>
-                        <th>Количество</th>
-                        <th>Процент</th>
-                        <th>Визуализация</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for role, count in metrics.users_by_role.items() %}
-                    {% set percentage = (count / metrics.total_users * 100) if metrics.total_users > 0 else 0 %}
-                    <tr>
-                        <td><strong>{{ role }}</strong></td>
-                        <td><span class="badge badge-primary">{{ count }}</span></td>
-                        <td>{{ "%.1f"|format(percentage) }}%</td>
-                        <td>
-                            <div class="progress">
-                                <div class="progress-bar" 
-                                     role="progressbar" 
-                                     style="width: {{ percentage }}%;"
-                                     aria-valuenow="{{ percentage }}" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100">
+            <p class="table-scroll-hint">👈 Листайте таблицу влево-вправо 👉</p>
+            <div class="table-wrapper">
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Роль</th>
+                            <th>Количество</th>
+                            <th>Процент</th>
+                            <th>Визуализация</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for role, count in metrics.users_by_role.items() %}
+                        {% set percentage = (count / metrics.total_users * 100) if metrics.total_users > 0 else 0 %}
+                        <tr>
+                            <td><strong>{{ role }}</strong></td>
+                            <td><span class="badge badge-primary">{{ count }}</span></td>
+                            <td>{{ "%.1f"|format(percentage) }}%</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         role="progressbar" 
+                                         style="width: {{ percentage }}%;"
+                                         aria-valuenow="{{ percentage }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -114,47 +117,50 @@
             <h5>✅ Статус верификации</h5>
         </div>
         <div class="card-body">
-            <table class="metrics-table">
-                <thead>
-                    <tr>
-                        <th>Статус</th>
-                        <th>Количество</th>
-                        <th>Процент</th>
-                        <th>Визуализация</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for status, count in metrics.users_by_verification.items() %}
-                    {% set percentage = (count / metrics.total_users * 100) if metrics.total_users > 0 else 0 %}
-                    <tr>
-                        <td>
-                            {% if status == 'approved' %}
-                                <strong style="color: green;">✅ Одобрено</strong>
-                            {% elif status == 'pending' %}
-                                <strong style="color: orange;">🟡 На проверке</strong>
-                            {% elif status == 'rejected' %}
-                                <strong style="color: red;">❌ Отклонено</strong>
-                            {% else %}
-                                <strong>⚪ Не подано</strong>
-                            {% endif %}
-                        </td>
-                        <td><span class="badge badge-primary">{{ count }}</span></td>
-                        <td>{{ "%.1f"|format(percentage) }}%</td>
-                        <td>
-                            <div class="progress">
-                                <div class="progress-bar" 
-                                     role="progressbar" 
-                                     style="width: {{ percentage }}%;"
-                                     aria-valuenow="{{ percentage }}" 
-                                     aria-valuemin="0" 
-                                     aria-valuemax="100">
+            <p class="table-scroll-hint">👈 Листайте таблицу влево-вправо 👉</p>
+            <div class="table-wrapper">
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Статус</th>
+                            <th>Количество</th>
+                            <th>Процент</th>
+                            <th>Визуализация</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for status, count in metrics.users_by_verification.items() %}
+                        {% set percentage = (count / metrics.total_users * 100) if metrics.total_users > 0 else 0 %}
+                        <tr>
+                            <td>
+                                {% if status == 'approved' %}
+                                    <strong style="color: green;">✅ Одобрено</strong>
+                                {% elif status == 'pending' %}
+                                    <strong style="color: orange;">🟡 На проверке</strong>
+                                {% elif status == 'rejected' %}
+                                    <strong style="color: red;">❌ Отклонено</strong>
+                                {% else %}
+                                    <strong>⚪ Не подано</strong>
+                                {% endif %}
+                            </td>
+                            <td><span class="badge badge-primary">{{ count }}</span></td>
+                            <td>{{ "%.1f"|format(percentage) }}%</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         role="progressbar" 
+                                         style="width: {{ percentage }}%;"
+                                         aria-valuenow="{{ percentage }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -165,26 +171,29 @@
         </div>
         <div class="card-body">
             {% if metrics.top_users %}
-                <table class="metrics-table">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Email</th>
-                            <th>Компания</th>
-                            <th>Записей</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in metrics.top_users %}
-                        <tr>
-                            <td>{{ loop.index }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.company_name or 'Не указана' }}</td>
-                            <td><span class="badge badge-primary">{{ user.employee_count }}</span></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                <p class="table-scroll-hint">👈 Листайте таблицу влево-вправо 👉</p>
+                <div class="table-wrapper">
+                    <table class="metrics-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Email</th>
+                                <th>Компания</th>
+                                <th>Записей</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in metrics.top_users %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>{{ user.email }}</td>
+                                <td>{{ user.company_name or 'Не указана' }}</td>
+                                <td><span class="badge badge-primary">{{ user.employee_count }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             {% else %}
                 <p>Нет данных о пользователях</p>
             {% endif %}
