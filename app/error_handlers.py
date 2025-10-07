@@ -25,12 +25,16 @@ def setup_error_handlers(app: FastAPI) -> None:
             status_code=404
         )
     
-    @app.exception_handler(500)
-    async def internal_server_error(request: Request, exc: Exception):
-        """Обработка 500 ошибок с отправкой уведомления в Telegram"""
-        print(f"🚨 500 ERROR HANDLER вызван!")
+    @app.exception_handler(Exception)
+    async def general_exception_handler(request: Request, exc: Exception):
+        """Обработка всех исключений с отправкой уведомления в Telegram"""
+        print(f"🚨 EXCEPTION HANDLER вызван!")
         print(f"🚨 Ошибка: {exc}")
         print(f"🚨 Тип ошибки: {type(exc)}")
+        
+        # Не обрабатываем HTTPException (они уже обработаны выше)
+        if isinstance(exc, HTTPException):
+            raise exc
         
         try:
             # Получаем информацию о пользователе из токена (если есть)
@@ -47,7 +51,7 @@ def setup_error_handlers(app: FastAPI) -> None:
             send_500_error_notification(exc, request, user_info)
             
             # Логируем ошибку
-            logger.error(f"500 Error: {exc}", exc_info=True)
+            logger.error(f"Unhandled Exception: {exc}", exc_info=True)
             
         except Exception as notification_error:
             logger.error(f"Ошибка при отправке уведомления: {notification_error}")
@@ -56,38 +60,4 @@ def setup_error_handlers(app: FastAPI) -> None:
         return JSONResponse(
             status_code=500,
             content={"detail": "Внутренняя ошибка сервера. Мы уже работаем над её исправлением."}
-        )
-    
-    @app.exception_handler(Exception)
-    async def general_exception_handler(request: Request, exc: Exception):
-        """Обработка всех остальных исключений"""
-        # Не обрабатываем HTTPException (они уже обработаны выше)
-        if isinstance(exc, HTTPException):
-            raise exc
-        
-        try:
-            # Получаем информацию о пользователе
-            user_info = None
-            try:
-                from app.auth import get_current_user_safe
-                current_user = get_current_user_safe(request)
-                if current_user:
-                    user_info = f"{current_user.name} ({current_user.email})"
-            except:
-                pass
-            
-            # Отправляем уведомление для критических ошибок
-            if not isinstance(exc, (HTTPException,)):
-                send_error_notification(exc, request, user_info)
-            
-            # Логируем ошибку
-            logger.error(f"Unhandled Exception: {exc}", exc_info=True)
-            
-        except Exception as notification_error:
-            logger.error(f"Ошибка при отправке уведомления: {notification_error}")
-        
-        # Возвращаем 500 ошибку
-        return JSONResponse(
-            status_code=500,
-            content={"detail": "Произошла непредвиденная ошибка. Мы уже работаем над её исправлением."}
         )
