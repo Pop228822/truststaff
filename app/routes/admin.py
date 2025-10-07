@@ -180,11 +180,37 @@ def admin_user_details(
     })
 
 
-@router.get("/admin/metrics")
-def admin_metrics(
+@router.get("/admin/metrics", response_class=HTMLResponse)
+def admin_metrics_html(
+    request: Request,
     current_user: User = Depends(ensure_admin)
 ):
-    """Метрики приложения (только для админов)"""
+    """HTML страница с метриками (только для админов)"""
+    uptime = datetime.now() - metrics_store["start_time"]
+    
+    metrics_data = {
+        "uptime_seconds": uptime.total_seconds(),
+        "uptime_human": str(uptime).split('.')[0],  # Убираем микросекунды
+        "total_requests": sum(metrics_store["request_count"].values()),
+        "total_errors": sum(metrics_store["error_count"].values()),
+        "requests_by_endpoint": dict(metrics_store["request_count"]),
+        "errors_by_status": dict(metrics_store["error_count"]),
+        "admin_viewing": current_user.email,
+        "timestamp": datetime.now().isoformat()
+    }
+    
+    return templates.TemplateResponse("admin_metrics.html", {
+        "request": request,
+        "metrics": metrics_data,
+        "user": current_user
+    })
+
+
+@router.get("/admin/metrics/api")
+def admin_metrics_api(
+    current_user: User = Depends(ensure_admin)
+):
+    """API endpoint с метриками (только для админов)"""
     uptime = datetime.now() - metrics_store["start_time"]
     
     return {

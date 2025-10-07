@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Метрики системы - TrustStaff{% endblock %}
+
+{% block content %}
+<div class="metrics-container">
+    <h1>📊 Метрики системы</h1>
+
+    <!-- Основные показатели -->
+    <div class="metrics-grid">
+        <div class="metrics-card card-primary">
+            <div class="card-body">
+                <h4 class="card-title">{{ metrics.uptime_human }}</h4>
+                <p class="card-text">⏰ Время работы</p>
+            </div>
+        </div>
+        
+        <div class="metrics-card card-success">
+            <div class="card-body">
+                <h4 class="card-title">{{ metrics.total_requests }}</h4>
+                <p class="card-text">🌐 Всего запросов</p>
+            </div>
+        </div>
+        
+        <div class="metrics-card card-warning">
+            <div class="card-body">
+                <h4 class="card-title">{{ metrics.total_errors }}</h4>
+                <p class="card-text">⚠️ Ошибок</p>
+            </div>
+        </div>
+        
+        <div class="metrics-card card-info">
+            <div class="card-body">
+                <h4 class="card-title">{{ metrics.requests_by_endpoint|length }}</h4>
+                <p class="card-text">🔗 Уникальных endpoints</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Таблица популярных endpoints -->
+    <div class="metrics-card">
+        <div class="card-header">
+            <h5>📋 Популярные endpoints</h5>
+        </div>
+        <div class="card-body">
+            {% if metrics.requests_by_endpoint %}
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Endpoint</th>
+                            <th>Запросов</th>
+                            <th>Процент</th>
+                            <th>Прогресс</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for endpoint, count in metrics.requests_by_endpoint.items() %}
+                        {% set percentage = (count / metrics.total_requests * 100) if metrics.total_requests > 0 else 0 %}
+                        <tr>
+                            <td>
+                                <code>{{ endpoint }}</code>
+                            </td>
+                            <td>
+                                <span class="badge badge-primary">{{ count }}</span>
+                            </td>
+                            <td>{{ "%.1f"|format(percentage) }}%</td>
+                            <td>
+                                <div class="progress">
+                                    <div class="progress-bar" 
+                                         role="progressbar" 
+                                         style="width: {{ percentage }}%;"
+                                         aria-valuenow="{{ percentage }}" 
+                                         aria-valuemin="0" 
+                                         aria-valuemax="100">
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Нет данных о запросах</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Ошибки -->
+    {% if metrics.errors_by_status %}
+    <div class="metrics-card card-danger">
+        <div class="card-header">
+            <h5>🚨 Ошибки по статусам</h5>
+        </div>
+        <div class="card-body">
+            <div class="metrics-grid">
+                {% for status, count in metrics.errors_by_status.items() %}
+                <div class="alert alert-danger">
+                    <strong>HTTP {{ status }}:</strong> {{ count }} ошибок
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Информация о сессии -->
+    <div class="metrics-card">
+        <div class="card-header">
+            <h5>ℹ️ Информация о сессии</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>👤 Администратор:</strong> {{ metrics.admin_viewing }}</p>
+            <p><strong>📅 Последнее обновление:</strong> {{ metrics.timestamp }}</p>
+            <p><strong>⏱️ Время работы (секунды):</strong> {{ "%.2f"|format(metrics.uptime_seconds) }}</p>
+            <p><strong>⚡ Среднее время между запросами:</strong> 
+                {% if metrics.total_requests > 0 %}
+                    {{ "%.2f"|format(metrics.uptime_seconds / metrics.total_requests) }} сек
+                {% else %}
+                    Н/Д
+                {% endif %}
+            </p>
+        </div>
+    </div>
+
+    <!-- Кнопки -->
+    <div class="metrics-buttons">
+        <button class="big-button" onclick="location.reload()">
+            🔄 Обновить данные
+        </button>
+        <a href="/admin/review" class="big-button">
+            ← Назад к админке
+        </a>
+    </div>
+</div>
+{% endblock %}
