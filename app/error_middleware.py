@@ -17,10 +17,6 @@ class ErrorNotificationMiddleware(BaseHTTPMiddleware):
             response = await call_next(request)
             return response
         except Exception as exc:
-            print(f"🚨 ERROR MIDDLEWARE перехватил ошибку!")
-            print(f"🚨 Ошибка: {exc}")
-            print(f"🚨 Тип ошибки: {type(exc)}")
-            
             try:
                 # Получаем информацию о пользователе
                 user_info = None
@@ -33,11 +29,13 @@ class ErrorNotificationMiddleware(BaseHTTPMiddleware):
                     pass
                 
                 # Отправляем уведомление в Telegram
-                print(f"🚨 Отправляем уведомление через middleware...")
                 send_500_error_notification(exc, request, user_info)
                 
             except Exception as notification_error:
-                print(f"❌ Ошибка при отправке уведомления через middleware: {notification_error}")
+                # Логируем ошибку, но не выводим в консоль
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Ошибка при отправке уведомления через middleware: {notification_error}")
             
             # Возвращаем ошибку пользователю
             return JSONResponse(

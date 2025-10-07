@@ -28,10 +28,6 @@ def setup_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
         """Обработка всех исключений с отправкой уведомления в Telegram"""
-        print(f"🚨 EXCEPTION HANDLER вызван!")
-        print(f"🚨 Ошибка: {exc}")
-        print(f"🚨 Тип ошибки: {type(exc)}")
-        
         # Не обрабатываем HTTPException (они уже обработаны выше)
         if isinstance(exc, HTTPException):
             raise exc

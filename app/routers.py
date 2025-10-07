@@ -8,7 +8,7 @@ from app.routes import (
     onboarding, api_register, autocomplete, check, feedback,
     password_recovery, admin, api_feedback, api_auth, api_2fa,
     api_employees, api_check, api_employee, api_employer,
-    api_info_of_me, api_password_recovery, test_errors
+    api_info_of_me, api_password_recovery
 )
 
 
@@ -39,6 +39,3 @@ def setup_routers(app: FastAPI) -> None:
     app.include_router(api_employer.router)
     app.include_router(api_info_of_me.router)
     app.include_router(api_password_recovery.api_router)
-    
-    # Тестовые роуты (только для разработки)
-    app.include_router(test_errors.router)

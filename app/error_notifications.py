@@ -26,14 +26,7 @@ def send_error_notification(
         request: Объект запроса FastAPI (опционально)
         user_info: Информация о пользователе (опционально)
     """
-    print(f"🔍 DEBUG: send_error_notification вызвана")
-    print(f"🔍 DEBUG: TELEGRAM_TOKEN = {TELEGRAM_TOKEN[:10] + '...' if TELEGRAM_TOKEN else 'None'}")
-    print(f"🔍 DEBUG: TELEGRAM_CHAT_ID = {TELEGRAM_CHAT_ID}")
-    
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        print("❌ Telegram уведомления отключены: отсутствуют TELEGRAM_TOKEN или TELEGRAM_CHAT_ID")
-        print(f"❌ TELEGRAM_TOKEN: {TELEGRAM_TOKEN}")
-        print(f"❌ TELEGRAM_CHAT_ID: {TELEGRAM_CHAT_ID}")
         return
 
     try:
@@ -81,10 +74,6 @@ def send_error_notification(
 ```"""
 
         # Отправляем в Telegram
-        print(f"📤 Отправляем уведомление в Telegram...")
-        print(f"📤 URL: https://api.telegram.org/bot{TELEGRAM_TOKEN[:10]}.../sendMessage")
-        print(f"📤 Chat ID: {TELEGRAM_CHAT_ID}")
-        
         response = requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
             data={
@@ -95,19 +84,11 @@ def send_error_notification(
             timeout=10
         )
         
-        print(f"📤 Ответ Telegram API: {response.status_code}")
-        print(f"📤 Содержимое ответа: {response.text}")
-        
-        if response.status_code != 200:
-            print(f"❌ Ошибка отправки уведомления в Telegram: {response.status_code}")
-            print(f"❌ Ответ: {response.text}")
-        else:
-            print(f"✅ Уведомление успешно отправлено!")
-            
     except Exception as e:
-        print(f"❌ Ошибка в send_error_notification: {e}")
-        import traceback
-        print(f"❌ Стек ошибки: {traceback.format_exc()}")
+        # Логируем ошибку, но не выводим в консоль
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Ошибка отправки уведомления в Telegram: {e}")
 
 
 def send_500_error_notification(
@@ -118,12 +99,7 @@ def send_500_error_notification(
     """
     Специальное уведомление для 500 ошибок
     """
-    print(f"🔥 DEBUG: send_500_error_notification вызвана")
-    print(f"🔥 DEBUG: TELEGRAM_TOKEN = {TELEGRAM_TOKEN[:10] + '...' if TELEGRAM_TOKEN else 'None'}")
-    print(f"🔥 DEBUG: TELEGRAM_CHAT_ID = {TELEGRAM_CHAT_ID}")
-    
     if not TELEGRAM_TOKEN or not TELEGRAM_CHAT_ID:
-        print("❌ 500 уведомления отключены: отсутствуют TELEGRAM_TOKEN или TELEGRAM_CHAT_ID")
         return
 
     try:
@@ -163,8 +139,6 @@ def send_500_error_notification(
 
 ⚠️ **Требуется немедленное внимание!**"""
 
-        print(f"🔥 Отправляем 500 уведомление в Telegram...")
-        
         response = requests.post(
             f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage",
             data={
@@ -175,16 +149,8 @@ def send_500_error_notification(
             timeout=10
         )
         
-        print(f"🔥 Ответ Telegram API: {response.status_code}")
-        print(f"🔥 Содержимое ответа: {response.text}")
-        
-        if response.status_code != 200:
-            print(f"❌ Ошибка отправки 500 уведомления: {response.status_code}")
-            print(f"❌ Ответ: {response.text}")
-        else:
-            print(f"✅ 500 уведомление успешно отправлено!")
-        
     except Exception as e:
-        print(f"❌ Ошибка отправки 500 уведомления: {e}")
-        import traceback
-        print(f"❌ Стек ошибки: {traceback.format_exc()}")
+        # Логируем ошибку, но не выводим в консоль
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Ошибка отправки 500 уведомления в Telegram: {e}")
