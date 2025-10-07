@@ -33,6 +33,11 @@
         <textarea name="dismissal_reason" maxlength="500">{{ dismissal_reason|default('') }}</textarea>
     </label><br><br>
 
-    <button type="submit">Добавить запись</button>
+    <div class="text-center">
+        <button type="submit" class="big-button">➕ Добавить запись</button>
+    </div>
+    <div class="text-center">
+        <a href="/employees" class="big-button">← Назад</a>
+    </div>
 </form>
 {% endblock %}
