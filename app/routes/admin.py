@@ -16,11 +16,15 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 # Простое хранилище метрик (в продакшене лучше Redis/InfluxDB)
+# С защитой от переполнения памяти
 metrics_store = {
     "request_count": defaultdict(int),
     "error_count": defaultdict(int),
     "start_time": datetime.now()
 }
+
+# Максимальное количество уникальных endpoints для хранения
+MAX_ENDPOINTS = 1000
 
 
 def ensure_admin(current_user: User = Depends(get_current_user)) -> User:
@@ -227,8 +231,24 @@ def admin_metrics_api(
 
 
 def record_request_metric(path: str, method: str, status_code: int):
-    """Функция для записи метрики запроса (можно вызывать из middleware)"""
+    """
+    Функция для записи метрики запроса (можно вызывать из middleware)
+    С защитой от переполнения памяти
+    """
     key = f"{method} {path}"
+    
+    # Защита от переполнения памяти
+    if len(metrics_store["request_count"]) >= MAX_ENDPOINTS:
+        # Если превысили лимит, удаляем самый редкий endpoint
+        if key not in metrics_store["request_count"]:
+            # Находим минимальный счетчик
+            min_key = min(
+                metrics_store["request_count"], 
+                key=metrics_store["request_count"].get
+            )
+            # Удаляем его, чтобы освободить место
+            del metrics_store["request_count"][min_key]
+    
     metrics_store["request_count"][key] += 1
     
     if status_code >= 400:
