@@ -45,11 +45,22 @@ def send_error_notification(
         # Информация о запросе
         request_info = ""
         if request:
+            # Безопасно получаем IP адрес
+            client_ip = "Неизвестно"
+            try:
+                if hasattr(request, 'client') and request.client:
+                    if hasattr(request.client, 'host'):
+                        client_ip = request.client.host
+                    elif hasattr(request.client, 'get'):
+                        client_ip = request.client.get('host', 'Неизвестно')
+            except:
+                pass
+            
             request_info = f"""
 🌐 **Запрос:**
 • URL: {getattr(request, 'url', 'Неизвестно')}
 • Метод: {getattr(request, 'method', 'Неизвестно')}
-• IP: {getattr(request, 'client', {}).get('host', 'Неизвестно') if hasattr(request, 'client') else 'Неизвестно'}
+• IP: {client_ip}
 • User-Agent: {request.headers.get('user-agent', 'Неизвестно') if hasattr(request, 'headers') else 'Неизвестно'}"""
 
         # Информация о пользователе
@@ -122,11 +133,22 @@ def send_500_error_notification(
         # Информация о запросе
         request_info = ""
         if request:
+            # Безопасно получаем IP адрес
+            client_ip = "Неизвестно"
+            try:
+                if hasattr(request, 'client') and request.client:
+                    if hasattr(request.client, 'host'):
+                        client_ip = request.client.host
+                    elif hasattr(request.client, 'get'):
+                        client_ip = request.client.get('host', 'Неизвестно')
+            except:
+                pass
+            
             request_info = f"""
 🌐 **Запрос:**
 • URL: {getattr(request, 'url', 'Неизвестно')}
 • Метод: {getattr(request, 'method', 'Неизвестно')}
-• IP: {getattr(request, 'client', {}).get('host', 'Неизвестно') if hasattr(request, 'client') else 'Неизвестно'}"""
+• IP: {client_ip}"""
 
         # Информация о пользователе
         user_info_text = f"\n👤 **Пользователь:** {user_info}" if user_info else ""
