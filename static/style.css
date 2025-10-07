@@ -923,6 +923,11 @@ button.reject {
     margin: 0 0.5rem;
 }
 
+/* Отступ между вертикальными кнопками в формах */
+.text-center + .text-center {
+    margin-top: 1rem;
+}
+
 /* Подсказка о возможности скролла на мобильных */
 .table-scroll-hint {
     display: none;
