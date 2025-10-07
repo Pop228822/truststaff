@@ -28,6 +28,10 @@ def setup_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(500)
     async def internal_server_error(request: Request, exc: Exception):
         """Обработка 500 ошибок с отправкой уведомления в Telegram"""
+        print(f"🚨 500 ERROR HANDLER вызван!")
+        print(f"🚨 Ошибка: {exc}")
+        print(f"🚨 Тип ошибки: {type(exc)}")
+        
         try:
             # Получаем информацию о пользователе из токена (если есть)
             user_info = None

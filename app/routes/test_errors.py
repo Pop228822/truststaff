@@ -64,3 +64,19 @@ def test_post_error(request: Request):
 def test_notification_ok():
     """Тестовый роут без ошибок"""
     return {"status": "ok", "message": "Система уведомлений работает корректно"}
+
+
+@router.get("/test/env/debug")
+def test_env_debug():
+    """Проверка переменных окружения"""
+    import os
+    from app.error_notifications import TELEGRAM_TOKEN, TELEGRAM_CHAT_ID
+    
+    return {
+        "TELEGRAM_TOKEN": TELEGRAM_TOKEN[:10] + "..." if TELEGRAM_TOKEN else None,
+        "TELEGRAM_CHAT_ID": TELEGRAM_CHAT_ID,
+        "all_env_vars": {
+            "TELEGRAM_TOKEN": os.getenv("TELEGRAM_TOKEN"),
+            "TELEGRAM_CHAT_ID": os.getenv("TELEGRAM_CHAT_ID"),
+        }
+    }
