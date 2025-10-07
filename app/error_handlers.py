@@ -27,30 +27,13 @@ def setup_error_handlers(app: FastAPI) -> None:
     
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
-        """Обработка всех исключений с отправкой уведомления в Telegram"""
+        """Обработка всех исключений - уведомления отправляет middleware"""
         # Не обрабатываем HTTPException (они уже обработаны выше)
         if isinstance(exc, HTTPException):
             raise exc
         
-        try:
-            # Получаем информацию о пользователе из токена (если есть)
-            user_info = None
-            try:
-                from app.auth import get_current_user_safe
-                current_user = get_current_user_safe(request)
-                if current_user:
-                    user_info = f"{current_user.name} ({current_user.email})"
-            except:
-                pass
-            
-            # Отправляем уведомление в Telegram
-            send_500_error_notification(exc, request, user_info)
-            
-            # Логируем ошибку
-            logger.error(f"Unhandled Exception: {exc}", exc_info=True)
-            
-        except Exception as notification_error:
-            logger.error(f"Ошибка при отправке уведомления: {notification_error}")
+        # Логируем ошибку (уведомления отправляет ErrorNotificationMiddleware)
+        logger.error(f"Unhandled Exception: {exc}", exc_info=True)
         
         # Возвращаем пользователю простую ошибку
         return JSONResponse(
