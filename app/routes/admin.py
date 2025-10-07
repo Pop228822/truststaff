@@ -3,13 +3,14 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 from starlette import status
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict
 import time
+from sqlalchemy import func
 
 from app.auth import get_current_user
 from app.database import get_session
-from app.models import User, Employee
+from app.models import User, Employee, ReputationRecord
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
@@ -232,3 +233,97 @@ def record_request_metric(path: str, method: str, status_code: int):
     
     if status_code >= 400:
         metrics_store["error_count"][str(status_code)] += 1
+
+
+@router.get("/admin/business-metrics", response_class=HTMLResponse)
+def admin_business_metrics(
+    request: Request,
+    db: Session = Depends(get_session),
+    current_user: User = Depends(ensure_admin)
+):
+    """Бизнес-метрики (только для админов)"""
+    
+    # Общая статистика пользователей
+    total_users = db.query(User).count()
+    verified_users = db.query(User).filter(User.verification_status == "approved").count()
+    pending_verification = db.query(User).filter(User.verification_status == "pending").count()
+    
+    # Статистика сотрудников
+    total_employees = db.query(Employee).count()
+    total_records = db.query(ReputationRecord).count()
+    
+    # Средние показатели
+    avg_employees_per_user = round(total_employees / total_users, 2) if total_users > 0 else 0
+    
+    # Новые пользователи
+    today = datetime.now().date()
+    week_ago = today - timedelta(days=7)
+    
+    new_users_today = db.query(User).filter(
+        func.date(User.created_at) == today
+    ).count() if hasattr(User, 'created_at') else 0
+    
+    new_users_week = db.query(User).filter(
+        func.date(User.created_at) >= week_ago
+    ).count() if hasattr(User, 'created_at') else 0
+    
+    # Распределение по ролям
+    users_by_role = {}
+    roles = db.query(User.role, func.count(User.id)).group_by(User.role).all()
+    for role, count in roles:
+        users_by_role[role or 'user'] = count
+    
+    # Распределение по статусу верификации
+    users_by_verification = {}
+    verifications = db.query(
+        User.verification_status, 
+        func.count(User.id)
+    ).group_by(User.verification_status).all()
+    for status, count in verifications:
+        users_by_verification[status or 'none'] = count
+    
+    # Топ активных пользователей
+    top_users = db.query(
+        User.email,
+        User.company_name,
+        func.count(Employee.id).label('employee_count')
+    ).outerjoin(
+        Employee, User.id == Employee.created_by_user_id
+    ).group_by(
+        User.id, User.email, User.company_name
+    ).order_by(
+        func.count(Employee.id).desc()
+    ).limit(10).all()
+    
+    # Конверсия в верификацию
+    conversion_rate = (verified_users / total_users * 100) if total_users > 0 else 0
+    
+    metrics_data = {
+        "total_users": total_users,
+        "verified_users": verified_users,
+        "pending_verification": pending_verification,
+        "total_employees": total_employees,
+        "total_records": total_records,
+        "avg_employees_per_user": avg_employees_per_user,
+        "new_users_today": new_users_today,
+        "new_users_week": new_users_week,
+        "users_by_role": users_by_role,
+        "users_by_verification": users_by_verification,
+        "top_users": [
+            {
+                "email": user.email,
+                "company_name": user.company_name,
+                "employee_count": user.employee_count
+            }
+            for user in top_users
+        ],
+        "conversion_rate": round(conversion_rate, 1),
+        "admin_viewing": current_user.email,
+        "timestamp": datetime.now().isoformat()
+    }
+    
+    return templates.TemplateResponse("admin_business_metrics.html", {
+        "request": request,
+        "metrics": metrics_data,
+        "user": current_user
+    })
