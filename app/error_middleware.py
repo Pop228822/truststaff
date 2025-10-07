@@ -1,7 +1,6 @@
 """
 Middleware для перехвата ошибок и отправки уведомлений в Telegram
 """
-import traceback
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 from starlette.requests import Request

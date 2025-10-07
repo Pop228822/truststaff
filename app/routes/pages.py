@@ -11,12 +11,6 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-@router.get("/test-error")
-def test_error():
-    """Временный роут для тестирования 500 ошибки - УДАЛИТЬ ПОСЛЕ ТЕСТИРОВАНИЯ!"""
-    raise Exception("Тестовая 500 ошибка для проверки системы уведомлений")
-
-
 @router.get("/", response_class=HTMLResponse)
 def root(
     request: Request,

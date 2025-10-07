@@ -4,10 +4,8 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
-import traceback
 import logging
 
-from app.error_notifications import send_500_error_notification, send_error_notification
 
 templates = Jinja2Templates(directory="templates")
 logger = logging.getLogger(__name__)
