@@ -3,6 +3,9 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy.orm import Session
 from fastapi.templating import Jinja2Templates
 from starlette import status
+from datetime import datetime
+from collections import defaultdict
+import time
 
 from app.auth import get_current_user
 from app.database import get_session
@@ -10,6 +13,13 @@ from app.models import User, Employee
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
+
+# Простое хранилище метрик (в продакшене лучше Redis/InfluxDB)
+metrics_store = {
+    "request_count": defaultdict(int),
+    "error_count": defaultdict(int),
+    "start_time": datetime.now()
+}
 
 
 def ensure_admin(current_user: User = Depends(get_current_user)) -> User:
@@ -168,3 +178,31 @@ def admin_user_details(
         "found_user": found_user,
         "employees": employees
     })
+
+
+@router.get("/admin/metrics")
+def admin_metrics(
+    current_user: User = Depends(ensure_admin)
+):
+    """Метрики приложения (только для админов)"""
+    uptime = datetime.now() - metrics_store["start_time"]
+    
+    return {
+        "uptime_seconds": uptime.total_seconds(),
+        "uptime_human": str(uptime).split('.')[0],  # Убираем микросекунды
+        "total_requests": sum(metrics_store["request_count"].values()),
+        "total_errors": sum(metrics_store["error_count"].values()),
+        "requests_by_endpoint": dict(metrics_store["request_count"]),
+        "errors_by_status": dict(metrics_store["error_count"]),
+        "admin_viewing": current_user.email,
+        "timestamp": datetime.now().isoformat()
+    }
+
+
+def record_request_metric(path: str, method: str, status_code: int):
+    """Функция для записи метрики запроса (можно вызывать из middleware)"""
+    key = f"{method} {path}"
+    metrics_store["request_count"][key] += 1
+    
+    if status_code >= 400:
+        metrics_store["error_count"][str(status_code)] += 1

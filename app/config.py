@@ -8,6 +8,7 @@ from app.auth_redirect import AuthRedirectMiddleware
 from app.limit import rate_limit_100_per_minute
 from app.security_headers import SecurityHeadersMiddleware
 from app.error_middleware import ErrorNotificationMiddleware
+from app.metrics_middleware import MetricsMiddleware
 
 
 def create_app() -> FastAPI:
@@ -17,7 +18,8 @@ def create_app() -> FastAPI:
     )
     
     # Добавляем middleware (порядок важен!)
-    app.add_middleware(ErrorNotificationMiddleware)  # Должен быть первым!
+    app.add_middleware(MetricsMiddleware)  # Собираем метрики
+    app.add_middleware(ErrorNotificationMiddleware)  # Обрабатываем ошибки
     app.add_middleware(AuthRedirectMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     
