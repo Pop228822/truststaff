@@ -1,15 +1,28 @@
-version: '3.8'
+version: '3.9'
 
 services:
-  truststaff:
+  postgres:
+    image: postgres:15
+    container_name: truststaff_postgres
+    restart: always
+    env_file:
+      - .env.postgres
+    volumes:
+      - truststaff_postgres_data:/var/lib/postgresql/data
+
+  app:
     container_name: truststaff
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "127.0.0.1:8000:8000"
+    restart: unless-stopped
     env_file:
       - .env
-    restart: unless-stopped
-    volumes:
-      - .:/app
+    depends_on:
+      - postgres
+    ports:
+      - "127.0.0.1:8000:8000"
+
+volumes:
+  truststaff_postgres_data:
+    external: true
