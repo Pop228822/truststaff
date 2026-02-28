@@ -46,7 +46,7 @@ def login_user(
     request: Request,
     email: str = Form(...),
     password: str = Form(...),
-    g_recaptcha_response: str = Form(..., alias="g-recaptcha-response"),
+    g_recaptcha_response: str | None = Form(default=None, alias="g-recaptcha-response"),
     session: Session = Depends(get_session)
 ):
     """Обработка входа пользователя"""
