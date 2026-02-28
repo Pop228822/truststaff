@@ -9,8 +9,10 @@ services:
       - .env.postgres
     volumes:
       - truststaff_postgres_data:/var/lib/postgresql/data
+    networks:
+      - truststaff_network
 
-  app:
+  truststaff:
     container_name: truststaff
     build:
       context: .
@@ -22,7 +24,11 @@ services:
       - postgres
     ports:
       - "127.0.0.1:8000:8000"
+    networks:
+      - truststaff_network
 
 volumes:
   truststaff_postgres_data:
-    external: true
+
+networks:
+  truststaff_network:
