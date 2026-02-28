@@ -26,7 +26,6 @@ def inc_check(db, employee_id: int) -> None:
 def set_reaction(db: Session, employee_id: int, employer_id: int, new_reaction: str) -> None:
     assert new_reaction in ("like", "dislike")
 
-    # читаем текущую реакцию
     row = db.execute(
         text("""
             SELECT reaction FROM employee_reaction
@@ -36,11 +35,10 @@ def set_reaction(db: Session, employee_id: int, employer_id: int, new_reaction: 
     ).first()
 
     if row is None:
-        # не голосовал — вставляем и инкрементим нужный счётчик
         db.execute(
             text("""
-                INSERT INTO employee_reaction (employee_id, employer_id, reaction)
-                VALUES (:e, :u, :r)
+                INSERT INTO employee_reaction (employee_id, employer_id, reaction, created_at, updated_at)
+                VALUES (:e, :u, :r, NOW(), NOW())
             """),
             {"e": employee_id, "u": employer_id, "r": new_reaction}
         )
@@ -52,10 +50,8 @@ def set_reaction(db: Session, employee_id: int, employer_id: int, new_reaction: 
     else:
         old = row[0]
         if old == new_reaction:
-            # повторное нажатие того же — ничего не делаем
             pass
         else:
-            # смена реакции: +1 к новой, -1 к старой
             db.execute(
                 text("""
                     UPDATE employee_reaction
